@@ -1,0 +1,35 @@
+<template>
+<!-- html -->
+ <div class="app">
+  <h1>Hello</h1>
+  <Person></Person>
+  <PersonVue3></PersonVue3>
+ </div>
+
+</template>
+
+<script lang="ts">
+//js ts
+import Person from './components/Person.vue'
+import PersonVue3 from './components/PersonVue3.vue';
+export default {
+  name : 'App',
+  components:{   //register components
+    Person,
+    PersonVue3
+  }
+
+}
+</script>
+
+<style>
+/* css */
+.app{
+
+  background-color: #ddd;
+  box-shadow: 5px 5px 10px #000;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+</style>
