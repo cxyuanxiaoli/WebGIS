@@ -36,7 +36,7 @@ export default{
 </script> -->
 
 <!-- setup语法糖 -->
-<script lang="ts" setup name="PersonVue23">
+<script lang="ts" setup name="PersonVue3">
 //data
 let name = 'zhangsan'
 let age = 30

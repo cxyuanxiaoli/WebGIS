@@ -4,6 +4,8 @@
   <h1>Hello</h1>
   <Person></Person>
   <PersonVue3></PersonVue3>
+  <PersonRef></PersonRef>
+  <PersonComputed></PersonComputed>
  </div>
 
 </template>
@@ -11,12 +13,16 @@
 <script lang="ts">
 //js ts
 import Person from './components/Person.vue'
-import PersonVue3 from './components/PersonVue3.vue';
+import PersonVue3 from './components/PersonVue3.vue'
+import PersonRef from './components/PersonRef.vue'
+import PersonComputed from './components/PersonComputed.vue'
 export default {
   name : 'App',
   components:{   //register components
     Person,
-    PersonVue3
+    PersonVue3,
+    PersonRef,
+    PersonComputed,
   }
 
 }

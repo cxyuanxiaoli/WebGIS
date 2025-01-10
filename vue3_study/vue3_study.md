@@ -186,4 +186,110 @@ function changeName() {
    </script>
    ```
 
-   
+
+### 响应式数据
+
+#### ref
+
+1. 创建基本类型的响应式数据
+
+   导入 ref :  import { ref }  from 'vue'
+
+   使用 ref (value)  创建基本类型响应式数据: let name = ref ( 'zhangsan' )
+
+   修改响应式数据的值 : name.value = 'lisi'
+
+   在 template 中 变量名 name 即代表 name.value
+
+<img src="C:\Users\86132\AppData\Roaming\Typora\typora-user-images\image-20250110205836212.png" alt="image-20250110205836212" style="zoom:50%;" />
+
+1. 创建对象类型的响应式数据 
+
+   与上面一致，需注意 obj.value 表示原对象
+
+   ref 创建对象类型响应式数据是使用 reactive 实现
+
+   <img src="C:\Users\86132\AppData\Roaming\Typora\typora-user-images\image-20250110210211668.png" alt="image-20250110210211668" style="zoom:50%;" />
+
+#### reactive
+
+* 只能创建对象类型的响应式数据
+
+  导入 reactive : import { reactive }  from 'vue'
+
+  使用 reactive(obj) 创建对象类型的响应式数据 :  let obj = reactive ( {a:'123', b:123} )
+
+  修改响应式数据的值无需写 value ，直接修改
+
+  reactive 创建的响应式对象是深层次的
+
+  <img src="C:\Users\86132\AppData\Roaming\Typora\typora-user-images\image-20250110210253314.png" alt="image-20250110210253314" style="zoom:50%;" />
+
+#### ref vs reactive
+
+1. ref 用于定义 基本数据类型、对象数据类型
+2. reactive 用于定义 对象数据类型
+
+区别：
+
+1. ref 创建的变量必须使用 .value (可打开vue扩展设置自动添加 .value)
+2. reactive重新分配一个新对象，会失去响应式 (可以使用 Object.assign 整体替换对象)
+
+使用原则：
+
+1. 若需要一个基本类型的响应式数据，必须使用 ref
+2. 若需要一个响应式对象，层级不深， ref 、reactive 都可以
+3. 若需要一个响应式对象且层级较深，推荐使用 reactive
+
+#### toRefs and toRef
+
+作用：将一个由 reactive 定义的响应式对象的各属性解构到各变量且保持解构后各变量的响应式
+
+import  { toRefs, toRef }  from 'vue'
+
+let person = reactive ( { name:'lisi', age:22 } )
+
+let { name, age } = toRefs ( person )   //将响应式对象的多个属性解构赋值到变量 
+
+let nm = toRef ( person, 'name' )   //将响应式对象的单个属性解构赋值到变量
+
+**注**：解构后的变量值的改变 会改变原响应式对象的属性值
+
+### **computed**
+
+计算属性，实质是一个函数，返回一个 ComputedRefImpl 对象
+
+```js
+import {computed} from 'vue'
+//简单写法(只读)
+let fullName = computed(() => {
+   return firstName.value+' '+lastName.value
+})
+//完整写法(可读可写)
+let fullName = computed({
+  get(){
+    return firstName.value+' '+lastName.value
+  },
+  set(value){
+    firstName.value = value.split(' ')[0]
+    lastName.value = value.split(' ')[1]
+  }
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
