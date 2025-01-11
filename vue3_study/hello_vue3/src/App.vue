@@ -6,6 +6,7 @@
   <PersonVue3></PersonVue3>
   <PersonRef></PersonRef>
   <PersonComputed></PersonComputed>
+  <PersonWatch></PersonWatch>
  </div>
 
 </template>
@@ -16,6 +17,7 @@ import Person from './components/Person.vue'
 import PersonVue3 from './components/PersonVue3.vue'
 import PersonRef from './components/PersonRef.vue'
 import PersonComputed from './components/PersonComputed.vue'
+import PersonWatch from './components/PersonWatch.vue'
 export default {
   name : 'App',
   components:{   //register components
@@ -23,6 +25,7 @@ export default {
     PersonVue3,
     PersonRef,
     PersonComputed,
+    PersonWatch,
   }
 
 }

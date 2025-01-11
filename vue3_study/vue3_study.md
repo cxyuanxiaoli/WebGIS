@@ -277,7 +277,147 @@ let fullName = computed({
 })
 ```
 
+### **watch**
 
+* 作用：监视数据的变化
+
+* | 特点：Vue3中的watch只能监视以下四种数据： |
+  | :---------------------------------------- |
+  | 1. ref 定义的数据                         |
+  | 2. reactive 定义的数据                    |
+  | 3. 函数返回一个值 ( getter 函数 )         |
+  | 4. 一个包含上述内容的数组                 |
+
+#### 情况一
+
+监视 ref 定义的基本类型数据，直接写数据名即可，监视的是其value值的改变。
+
+```js
+import { ref,watch } from 'vue'
+let sum = ref(0)
+//情况一：watch监视ref定义的基本类型数据
+const stopWatch = watch(sum,(newVal,oldVal)=>{
+  console.log('watch情况一：',newVal,oldVal)
+  if(newVal > 10){
+    stopWatch()
+  }
+})
+```
+
+#### 情况二
+
+监视ref定义的对象类型数据，直接写数据名即可，监视的是对象的地址值，若想监视对象内部的数据，要手动开启深度监视。
+
+| 注意：                                                       |
+| ------------------------------------------------------------ |
+| 1. 若修改的是ref定义的对象中的属性，newValue 和 oldValue 都是新值，因为它们是同一个对象 |
+| 2. 若修改的是整个ref定义的对象，则 newValue是新值，oldValue 是旧值，因为不是同一个对象了 |
+
+```js
+import { ref,watch } from 'vue'
+let person = ref({name:'zhangsan',age:18})
+//情况二：watch监视ref定义的对象类型数据
+watch(person,(newVal,oldVal)=>{
+  console.log('watch情况二：',newVal,oldVal)
+},{deep:true})
+```
+
+#### 情况三
+
+监视reactive定义的对象类型数据，默认是开启深度监视的，且深度监视无法关闭
+
+```js
+import { reactive,watch } from 'vue'
+let person2 = reactive({name:'zhangsan',age:18})
+function changeName2(){
+  person2.name +='~'
+}
+function changeAge2(){
+  person2.age+=1
+}
+function changePerson2(){
+  Object.assign(person2,{name:'lisi',age:40})
+}
+//情况三：watch监视reactive定义的对象类型数据
+watch(person2,(newVal,oldVal)=>{
+  console.log('watch情况三：',newVal,oldVal)
+})
+```
+
+
+
+#### 情况四
+
+监视ref或reactive定义的对象类型的某个属性，写一个getter函数，返回该属性值
+
+若监视的属性为一个对象，则监视的是该对象的地址值，需要手动开启深度监视以监视该对象内部改变
+
+```js
+import { reactive,watch } from 'vue'
+let person3 = reactive({name:'wangwu',car:{c1:'BMW',c2:'Audi'}})
+
+function changeName3(){
+  person3.name +='~'
+}
+function changeC1(){
+  person3.car.c1 = 'Benz'
+}
+function changeC2(){
+  person3.car.c2 = 'Tesla'
+}
+function changeCar(){
+  person3.car = {c1:'BYD',c2:'Chery'}
+}
+//情况四：watch监视ref 或 reactive 定义的对象类型数据的某个属性
+watch(()=> person3.name,(newVal,oldVal)=>{
+  console.log('watch情况四：',newVal,oldVal)
+})
+watch(()=> person3.car,(newVal,oldVal)=>{
+  console.log('watch情况四：',newVal,oldVal)
+},{deep:true})
+```
+
+#### 情况五
+
+监视以上多个数据的组合
+
+```js
+//情况五：监视以上四种情况的组合
+watch([() => person3.name, () => person3.car], (newVal, oldVal) => {
+  console.log('watch情况五：', newVal, oldVal)
+}, { deep: true })
+```
+
+### watchEffect
+
+立即运行一个函数，同时响应式地追踪其依赖，并在依赖改变时重新执行该函数
+
+watch vs watchEffect
+
+1. 都能监听响应式数据的变化，不同的是监听数据变化的方式
+2. watch要明确指出监听的数据
+3. watchEffect不同明确指出监视的数据(函数中用到哪些属性，那就监视哪些数据)
+
+```js
+import { ref,watch,watchEffect }  from 'vue'
+let waterTemp = ref(10)
+let waterLevel = ref(0)
+//监视水温和水位，当水温达到60或水位达到80时打印信息
+/*
+watch([waterTemp, waterLevel],(newVal)=>{
+  let [temp, level] = newVal
+  if(temp >= 60 || level >=80){
+    console.log('some infomation')  
+  }
+})
+*/
+//watchEffect的另一种写法
+watchEffect(()=>{
+  if(waterTemp.value >= 60 || waterLevel.value >=80){
+    console.log('some infomation')  
+  }
+})
+```
 
 
 
