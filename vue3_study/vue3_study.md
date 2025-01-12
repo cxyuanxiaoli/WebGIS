@@ -419,15 +419,273 @@ watchEffect(()=>{
 })
 ```
 
+### 标签的 ref 属性
 
+作用：用于注册模板引用
 
+* 用在普通的Dom标签上，获取的是Dom节点
+* 用在组件标签上，获取的是组件实例对象
 
+语法：
 
+1. 在dom标签或元素标签上写属性 ref="label"
+2. 定义变量 let label = ref ( )  变量 label 即为dom实例 或 组件实例
 
+获取dom元素：
 
+```js
+<template>
+  <div class="main">
+    <h2 ref="label">Hello</h2>
+    <button @click="showLabel">Click me</button>
+  </div>
+</template>
 
+<script lang="ts" setup name="RefLabel">
+import { ref } from 'vue'
+//获取dom元素
+let label = ref()
+function showLabel() {
+  console.log(label.value)
+}
 
+let a=ref(0)
+let b=ref({name:'jack'})
+defineExpose({a,b})
+</script>
+```
 
+获取组件元素：
+
+```js
+<template>
+<!-- html -->
+ <div class="app">
+  <RefLabel ref="refLabel"></RefLabel>
+  <button @click="showComponent">show component RefLabel</button>
+ </div>
+</template>
+
+<script lang="ts" setup name="App">
+import RefLabel from './components/RefLabel.vue'
+import { ref } from 'vue'
+
+let refLabel=ref()
+function showComponent(){
+  console.log('显示组件RefLabel',refLabel.value);
+}
+</script>
+```
+
+### TypeScript 初尝试
+
+```ts	
+//定义一个接口
+export interface Person{
+  name:string
+  age:number
+}
+//定义一个自定义类型
+export type PersonList = Array<Person>
+```
+
+```js
+import { type Person, type PersonList } from '@/types'
+//ts 类型约束
+let p1:Person = {name:'jack',age:20}
+let persons:PersonList = [{name:'jack',age:20},{name:'rose',age:25}]
+```
+
+### Props
+
+父组件向子组件传递数据：
+
+```js
+<template>
+  <div class="app">
+    <PersonProps :list="personList" />
+    <button @click="addPerson">add person</button>
+  </div>
+</template>
+
+<script lang="ts" setup name="App">
+import { reactive } from 'vue'
+import PersonProps from './components/PersonProps.vue'
+import { type PersonList } from '@/types'
+
+//props - 限制类型
+let personList=reactive<PersonList>([
+  {id:'01',name:'jack',age:20},
+  {id:'02',name:'rose',age:25},
+  {id:'03',name:'tom',age:30}
+])
+
+function addPerson(){
+  personList.push({id:'04',name:'jerry',age:20})
+}
+</script>
+
+```
+
+子组件接收数据：
+
+* 只接收props并在模板中展示  
+* 接收props并赋值给变量
+* 接收props并限制接收类型
+* 接收props并限制接收类型、必要性、配置默认值
+
+```js
+<template>
+  <div class="main">
+    props:
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="p in list" :key="p.id">
+          <td>{{ p.name }}</td>
+          <td>{{ p.age }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</template>
+
+<script lang="ts" setup name="PersonProps">
+import { withDefaults } from 'vue'
+import { type PersonList } from '@/types';
+//只接收props
+// defineProps(['list'])
+//接收props并赋值给变量
+// let props = defineProps(['list'])
+// console.log(props)
+//接收props并限制接收的类型
+// defineProps<{list: PersonList}>()
+//接收props并限制类型、必要性、配置默认值
+withDefaults(defineProps<{list?:PersonList}>(),{
+  list:()=> [{id:'1',name:'张三',age:20},{id:'2',name:'李四',age:25}]
+})
+</script>
+```
+
+### 生命周期
+
+ Vue组件实例在创建时要经历一系列的初始化步骤，在此过程中Vue会在合适的时机，调用特定的函数，从而让开发者有机会在特定的阶段运行自己的代码，这些特定的函数统称为：生命周期钩子
+
+Vue3的生命周期：
+
+* 创建阶段：setup
+* 挂载阶段：onBeforeMount、onMounted
+* 更新阶段：onBeforeUpdate、onUpdated
+* 卸载阶段：onBeforeUnmount、onUnmounted
+
+常用的钩子：onMounted (挂载完毕)、onUpdated (更新完毕)、onBeforeUnmount (卸载之前)
+
+```js
+<script lang="ts" setup name="LifeCycle">
+//生命周期
+import { onBeforeMount,onMounted,onBeforeUpdate,onUpdated,onBeforeUnmount,onUnmounted } from 'vue';
+console.log('life cycle:创建')
+onBeforeMount(()=>{
+  console.log('life cycle:挂载前')
+})
+onMounted(()=>{
+  console.log('life cycle:挂载完毕')
+})
+onBeforeUpdate(()=>{
+  console.log('life cycle:更新前')
+})
+onUpdated(()=>{
+  console.log('life cycle:更新完毕')
+})
+onBeforeUnmount(()=>{
+  console.log('life cycle:卸载前')
+})
+onUnmounted(()=>{
+  console.log('life cycle:卸载完毕')
+})
+</script>
+```
+
+### Hooks
+
+将组件各部分代码拆分到各hooks文件中
+
+组件代码：
+
+```js
+<template>
+  <div class="main">
+    <h2>当前求和为：{{ sum }},乘10={{ bigSum }}</h2>
+    <button @click="add">sum+1</button><br>
+    <img v-for="(dog, index) in dogList" :key="index" :src="dog">
+    <br>
+    <button @click="addDog">add dog</button>
+  </div>
+</template>
+
+<script lang="ts" setup name="LifeCycle">
+import { onMounted } from 'vue';
+import useDog from '@/hooks/useDog'
+import useSum from '@/hooks/useSum'
+
+let { dogList, addDog } = useDog()
+let { sum, bigSum, add } = useSum()
+onMounted(() => {
+  console.log('Hooks.vue mounted')
+})
+</script>
+```
+
+hook:useDog.ts
+
+```ts
+import { reactive, onMounted } from 'vue'
+import axios from 'axios'
+
+export default function () {
+  let dogList = reactive([''])
+  async function addDog() {
+    try {
+      let dog = await axios.get('https://dog.ceo/api/breeds/image/random')
+      dogList.push(dog.data.message)
+    } catch (error) {
+      alert(error)
+    }
+  }
+  onMounted(() => {
+    console.log('hooks mounted')
+  })
+  return { dogList, addDog }
+}
+```
+
+hook:useSum.ts
+
+```ts
+import { ref, computed, onMounted } from 'vue'
+
+export default function useSum() {
+  let sum = ref(0)
+  let bigSum = computed(() => {
+    return sum.value * 10
+  })
+
+  function add() {
+    sum.value += 1
+  }
+  onMounted(() => {
+    console.log('hooks2 mounted')
+  })
+  return { bigSum, sum, add }
+}
+
+```
 
 
 
