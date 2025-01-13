@@ -687,6 +687,458 @@ export default function useSum() {
 
 ```
 
+## Vue3 Router
+
+### 路由基本配置
+
+1. 安装 vue-router 依赖  npm i vue-router
+
+2. 创建router并配置routes
+
+   ```ts
+   //   src/router/index.ts
+   import { createRouter, createWebHistory } from "vue-router"
+   import Home from '@/components/Home.vue'
+   
+   const router = createRouter({
+     history: createWebHistory(),  //工作模式
+     routes:[{
+       path:'/home',
+       component:Home
+     }]
+   })
+   
+   export default router
+   ```
+
+3. 使用 router
+
+   ```ts
+   //main.ts
+   import { createApp } from 'vue'
+   import App from './App.vue'
+   import router from '@/router'
+   
+   const app=createApp(App)
+   app.use(router)
+   app.mount('#app')
+   ```
+
+4. 在模板中设置组件展示区域及切换路径链接
+
+   ```js
+   <script setup lang="ts" name="App">
+   import { RouterView,RouterLink } from 'vue-router'
+   </script>
+   
+   <template>
+     <div class="title">
+       <h2>Vue Router</h2>
+     </div>
+     <div class="navigate">
+       <RouterLink to="/home" active-class="active"> Home </RouterLink>
+       <RouterLink to="/news" active-class="active"> News </RouterLink>
+       <RouterLink to="/about" active-class="active"> About </RouterLink>
+     </div>
+     <div class="content">
+       <RouterView></RouterView>
+     </div>
+   </template>
+   ```
+
+### 两个注意点
+
+1. 路由组件通常放在 pages 或 views 文件夹，一般组件通常放在 components 文件夹
+2. 通过点击 routerlink 视觉效果上消失了的组件，默认是被**卸载**掉的，需要的时候再**挂载**
+
+### 路由器的两种工作模式
+
+* history
+
+  history : createWebHistory ( )
+
+  优点：URL美观，不带有#，更接近传统的网站URL
+
+  缺点：后期项目上线，需要配合处理路径问题，否则刷新会有404错误
+
+* hash
+
+  history : createWebHashHistory ( )
+
+  优点：兼容性更好，因为不需要服务端处理路径
+
+  缺点：URL带有#不美观，且在SEO优化方面相对较差
+
+### to的两种写法
+
+1. 字符串写法
+
+   <RouterLink to="/home" active-class="active"> Home </RouterLink>
+
+2. 对象写法
+
+   <RouterLink :to="{path:'/home'}" active-class="active"> Home </RouterLink>
+
+### 命名路由
+
+作用：可以简化路由跳转及传参
+
+给路由规则命名：
+
+```js
+const router = createRouter({
+  history: createWebHistory(),  //工作模式
+  routes:[{
+    name:'xinwen',
+    path:'/news',
+    component:News
+  },{
+    name:'guanyu',
+    path:'/about',
+    component:About
+  }]
+})
+```
+
+跳转路由：
+
+```js
+<RouterLink :to="{path:'/news'}" active-class="active"> News </RouterLink>
+<RouterLink :to="{name:'guanyu'}" active-class="active"> About </RouterLink>
+```
+
+### 嵌套路由
+
+配置二级路由：
+
+```js
+const router = createRouter({
+  history: createWebHistory(), 
+  routes: [{
+    name: 'shouye',
+    path: '/home',
+    component: Home
+  }, {
+    name: 'xinwen',
+    path: '/news',
+    component: News,
+    children: [{
+      name: 'xijie',
+      path: 'detail',
+      component: Detail
+    }]
+  }]
+})
+```
+
+设置组件显示区域及路径跳转：
+
+```js
+<template>
+  <div class="main">
+    <div class="newslist">
+      <h2>News</h2>
+      <ul>
+        <li v-for="item in news" :key="item.id">
+          <RouterLink :to="{ name: 'xijie' }">{{ item.title }}</RouterLink>
+        </li>
+      </ul>
+    </div>
+    <div class="detail">
+      <RouterView></RouterView>
+    </div>
+  </div>
+</template>
+```
+
+### 路由传参
+
+#### query参数
+
+1. 通过拼接路径字符串传参
+
+   ```js
+   <RouterLink :to="`/news/detail?id=${item.id}&title=${item.title}&content=${item.content}`" active-class="active">{{ item.title }}</RouterLink>
+   
+   ```
+
+2. 通过配置跳转路由对象传参
+
+   ```js
+   <RouterLink :to="{
+     name: 'xijie',
+     query: {
+     id: item.id,
+     title: item.title,
+     content: item.content
+     }
+   }" active-class="active">{{ item.title }}</RouterLink>
+   ```
+
+   接收参数：
+
+   ```js
+   <script lang="ts" setup name="Detail">
+   import { useRoute } from 'vue-router'
+   import { toRefs } from 'vue'
+   
+   let route=useRoute()
+   let { query } = toRefs(route)
+   console.log(query.value.id,query.value.title,query.value.content)
+   </script>
+   ```
+
+#### params参数
+
+注意：
+
+* 传递params参数时，若使用to的对象写法，必须使用name配置项，不能用path
+* 传递params参数时，需要提前在路由规则中占位
+
+路由配置：
+
+```js
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [{
+    name: 'xinwen',
+    path: '/news',
+    component: News,
+    children: [{
+      name: 'xijie',
+      path: 'detail/:id/:title/:content',     //使用占位符占位
+      component: Detail
+    }]
+  }]
+})
+```
+
+1. 字符串拼接
+
+   ```js
+   <RouterLink :to="`/news/detail/${item.id}/${item.title}/${item.content}`">{{ item.title }}</RouterLink>
+   ```
+
+2. 配置跳转路由对象
+
+   ```js
+   <RouterLink :to="{
+     name: 'xijie',      //必须指定跳转路由name属性而不是path属性
+     params: {
+       id: item.id,
+       title: item.title,
+       content: item.content
+     }
+   }">{{ item.title }}</RouterLink>
+   ```
+
+接收参数：
+
+```js
+import { useRoute } from 'vue-router'
+
+let route = useRoute()
+console.log(route.params.id,route.params.title,route.params.content)
+```
+
+### 路由的 props 配置
+
+作用：实现路由组件的props属性配置，用于传参
+
+1. 第一种写法，将路由组件收到的所有params参数作为props传递
+
+   需要配置路由：
+
+   ```js
+   const router = createRouter({
+     history: createWebHistory(),  
+     routes: [{
+       name: 'xinwen',
+       path: '/news',
+       component: News,
+       children: [{
+         name: 'xijie',
+         path: 'detail/:id/:title/:content',
+         component: Detail,
+         props: true     //开启props配置，将params参数作为props传递
+       }]
+     }]
+   })
+   ```
+
+2. 第二种写法，函数式，可以自己决定传递什么参数，自带一个参数为route
+
+   ```js
+   const router = createRouter({
+     history: createWebHistory(),  
+     routes: [{
+       name: 'xinwen',
+       path: '/news',
+       component: News,
+       children: [{
+         name: 'xijie',
+         path: 'detail/:id/:title/:content',
+         component: Detail,
+         props(to) {        //写成一个函数，将返回值作为props传递，to为当前route对象
+           return to.params
+         }
+       }]
+     }]
+   })
+   ```
+
+3. 第三种写法，对象式，可以自己决定传递什么参数
+
+   ```js
+   const router = createRouter({
+     history: createWebHistory(),  
+     routes: [{
+       name: 'xinwen',
+       path: '/news',
+       component: News,
+       children: [{
+         name: 'xijie',
+         path: 'detail/:id/:title/:content',
+         component: Detail,
+         props:{       //写成一个对象，将对象作为props传递，适合传递一些不变的内容
+           id:'1',
+           title:'2',
+           content:'3'
+         }
+       }]
+     }]
+   })
+   ```
+
+接收props参数
+
+```js
+<script lang="ts" setup name="Detail">
+//使用组件的props接收参数
+defineProps(['id', 'title', 'content'])
+</script>
+```
+
+### replace 属性
+
+作用：控制路由跳转时操作浏览器历史记录的模式
+
+浏览器的历史记录有两种写入模式：分别为push 和 replace
+
+* push是追加历史记录(默认)
+* replace是替换当前记录
+
+开启replace模式：
+
+```js
+<RouterLink replace :to="{ name: 'guanyu' }" active-class="active"> About </RouterLink>
+```
+
+### 编程式路由导航
+
+通过编程的方式而不是RouterLink实现路由跳转
+
+实现自动页面跳转：
+
+```js
+<script lang="ts" setup name="Home">
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()    //获取路由器对象
+onMounted(()=>{
+  setTimeout(() => {
+    router.push('/news')      //通过push方法跳转
+  }, 3000);
+})
+</script>
+```
+
+实现点击按钮跳转页面：
+
+```js
+<template>
+  <div class="main">
+    <div class="newslist">
+      <h2>News</h2>
+      <ul>
+        <li v-for="item in news" :key="item.id">
+          <button @click="showDetail(item)">查看详情</button>
+        </li>
+      </ul>
+    </div>
+    <div class="detail">
+      <RouterView></RouterView>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup name="News">
+import { RouterView, useRouter } from 'vue-router';
+let news = [{ id: 'sadqwdqwd01', title: 'news1', content: 'content1' },
+    { id: 'sadqwdqwd02', title: 'news2', content: 'content2' },
+    { id: 'sadqwdqwd03', title: 'news3', content: 'content3' }]
+interface NewsItem {
+  id: string
+  title: string
+  content: string
+}
+const router = useRouter()      //获取路由器对象
+function showDetail(item: NewsItem) {
+  router.push({          //页面跳转
+    name: 'xijie',
+    params: {
+      id: item.id,
+      title: item.title,
+      content: item.content
+    }
+  })
+}
+</script>
+```
+
+### 路由重定向
+
+```js
+const router = createRouter({
+  history: createWebHistory(), 
+  routes: [{
+    name: 'shouye',
+    path: '/home',
+    component: Home
+  }, {
+    path:'/',
+    redirect:'/home'    //将该路由重定向到主页
+  }]
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
