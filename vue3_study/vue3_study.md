@@ -1113,6 +1113,222 @@ const router = createRouter({
 })
 ```
 
+## Vue3 Pinia
+
+### 搭建pinia环境
+
+1. 安装pinia依赖：npm i pinia
+2. 在main.ts文件引入pinia：import { createPinia }  from 'pinia'
+3. 创建pinia：const pinia = createPinia ( )
+4. 使用pinia：app.use ( pinia )
+
+### 使用Pinia 存储、读取、修改数据
+
+#### 存储数据
+
+1. 在src目录下新建store文件夹
+
+2. 在store文件夹新建 ts文件
+
+   ```ts
+   //sum.ts
+   import { defineStore } from 'pinia'   //引入函数
+   //创建仓库对象，第一个参数为仓库id，第二个参数为配置对象
+   export const useSumStore =defineStore('sum',{    //将仓库导出
+     state(){        //存储数据
+       return{
+         count:6
+       }
+     }
+   })
+   ```
+
+#### 读取数据
+
+在需要用到数据的组件中编写
+
+1. 引入ts文件
+2. 调用函数获取数据仓库对象
+3. 读取数据
+
+```js
+<template>
+  <div class="count">
+    <h2>当前求和为：{{ sumStore.count }}</h2>   <!-- 拿到具体数据渲染 -->
+    <select v-model.number="n">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+  </div>
+</template>
+
+<script lang="ts" setup name="Sum">
+import { ref } from 'vue'
+import { useSumStore} from '@/store/sum'   //引入仓库创建函数
+
+const sumStore = useSumStore()     //得到数据仓库
+let n = ref(1)
+</script>
+```
+
+#### 修改数据
+
+1. 第一种方式，直接对数据进行修改
+
+   ```js
+   sumStore.count +=1
+   ```
+
+2. 第二种方式，使用仓库对象的 $patch() 进行批量修改
+
+   ```js
+   sumStore.$patch({
+       count:10,
+       a:'123',
+       b:12
+   })
+   ```
+
+3. 第三种方式，在定义数据仓库时提供 actions 配置项定义函数
+
+   ```ts
+   //sum.ts
+   import { defineStore } from 'pinia'
+   export const useSumStore = defineStore('sum', {
+     actions: {
+       increment(value: number) {
+         this.count += value        //使用this获取数据
+       }
+     },
+     state() {
+       return {
+         count: 6,
+         a: 'hello'
+       }
+     }
+   })
+   ```
+
+   ```js
+   sumStore.increment(n.value)   //在组件中调用对象函数修改数据
+   ```
+
+### storeToRefs
+
+解决的问题：通过调用函数得到的仓库对象为reactive类型，解构后数据会丢失响应式，而使用toRefs()函数会将reactive对象所有成员均转为ref类型，storeToRefs()函数的作用则是只将仓库对象中的数据转为ref对象，从而能使数据解构出来
+
+```js
+<template>
+  <div class="talk">
+    <button @click="getTalk">获取一句情话</button>
+    <ul>
+      <li v-for="talk in talks" :key="talk.id">{{ talk.content }}</li>
+    </ul>
+  </div>
+</template>
+
+<script lang="ts" setup name="LoveTalk">
+import { useLoveTalkStore } from '@/store/loveTalk'
+import { storeToRefs } from 'pinia'
+
+const loveTalkStore = useLoveTalkStore()
+const { talks } = storeToRefs(loveTalkStore)   //解构数据
+function getTalk() {
+  loveTalkStore.getTalk()
+}
+</script>
+```
+
+### getters
+
+作用：getters 主要用于定义计算属性，这些计算属性可以从存储的状态中派生出新的值或进行计算
+
+```ts
+import { defineStore } from 'pinia'
+
+export const useSumStore = defineStore('sum', {
+  state() {
+    return {
+      count: 6,
+      a: 'hello'
+    }
+  },
+  getters: {
+    doubleCount(): number {    //普通函数
+      return this.count * 2
+    },
+    upperA:state=>state.a.toUpperCase()   //箭头函数
+  }
+})
+```
+
+### $subscribe
+
+作用：subscribe 是一个用于监听状态变化的方法。通过 subscribe，可以在状态state发生变化时执行特定的逻辑
+
+参数：
+
+* **mutation**：一个对象，包含以下信息：
+  - `type`：表示变化的类型，通常是 `'direct'` 或 `'patch object'`
+  - `events`：一个对象，包含 `type` 和 `key`，表示具体的变化事件
+  - `storeId`：表示发生变化的 store 的 ID
+* **state**：表示当前的状态对象
+
+示例：
+
+```js
+loveTalkStore.$subscribe((mutation, state) => {
+  console.log('数据变化了')
+  localStorage.setItem('loveTalk', JSON.stringify(state.talks))
+})
+```
+
+### store组合式写法
+
+选项式：
+
+```ts
+import { defineStore } from 'pinia'
+import axios from 'axios'
+import { nanoid } from 'nanoid'
+
+export const useLoveTalkStore = defineStore('loveTalk', {
+  actions: {
+    async getTalk() {
+      let res = await axios.get('https://api.uomg.com/api/rand.qinghua?format=json')
+      this.talks.unshift({ id: nanoid(), content: res.data.content })
+    }
+  },
+  state() {
+    return {
+      talks: JSON.parse(localStorage.getItem('loveTalk') as string) || []
+    }
+  }
+})
+```
+
+组合式：
+
+```ts
+import { defineStore } from 'pinia'
+import axios from 'axios'
+import { nanoid } from 'nanoid'
+import { reactive } from 'vue'
+
+//组合式写法
+export const useLoveTalkStore = defineStore('loveTalk', () => {
+  const talks = reactive(JSON.parse(localStorage.getItem('loveTalk') as string) || [])
+
+  async function getTalk() {
+    let res = await axios.get('https://api.uomg.com/api/rand.qinghua?format=json')
+    talks.unshift({ id: nanoid(), content: res.data.content })
+  }
+  return{talks, getTalk}
+})
+```
+
 
 
 
