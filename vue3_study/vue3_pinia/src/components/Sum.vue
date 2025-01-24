@@ -14,7 +14,7 @@
 
 <script lang="ts" setup name="Sum">
 import { ref } from 'vue'
-import { useSumStore } from '@/store/Sum'
+import { useSumStore } from '@/store/sum'
 import { storeToRefs } from 'pinia'
 
 const sumStore = useSumStore()
