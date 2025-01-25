@@ -1,25 +1,25 @@
 <script setup lang="ts" name="App">
-import { RouterLink, RouterView } from 'vue-router'
-// import { request } from './request'
+import { RouterView } from 'vue-router'
+import { request } from './request'
 
-// async function test() {
-//   const res = await request.get('/')
-//   console.log(res.data)
-// }
+async function test() {
+  const res = await request.get('/test')
+  console.log(res.data)
+}
 
-// test()
+test()
 </script>
 
 <template>
-  <header>
-    <h2>Hello World2</h2>
-  </header>
-
-  <main>
-    <RouterLink to="/home">主页</RouterLink>
-    <RouterLink to="/login">登录</RouterLink>
-    <RouterView></RouterView>
-  </main>
+  <div class="app">
+    <RouterView />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app {
+  width: 100vw;
+  height: 100vh;
+  background-color: skyblue;
+}
+</style>

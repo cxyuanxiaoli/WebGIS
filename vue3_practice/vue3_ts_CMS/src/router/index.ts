@@ -26,4 +26,12 @@ const router = createRouter({
   ],
 })
 
+//确定用户是否登录
+router.beforeEach((to) => {
+  const token = localStorage.getItem('token')
+  if (to.path === '/home' && !token) {
+    return '/login'
+  }
+})
+
 export default router
