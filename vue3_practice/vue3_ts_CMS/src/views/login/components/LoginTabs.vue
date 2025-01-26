@@ -106,40 +106,44 @@ const accountRules: FormRules = {
 }
 
 //登录按钮逻辑
-function submit() {
-  //表单验证
-  accountForm.value?.validate((valid) => {
-    if (valid) {
-      //账号密码登录逻辑
-      if (selectTab.value === 'account') {
-        //调用action方法
-        loginStore
-          .loginAccountAction({
-            username: accountData.userName,
-            password: accountData.password,
-          })
-          .then(() => {
-            //登录成功
-            if (props.keepPassword) {
-              //记住密码逻辑
-              localStorage.setItem('username', accountData.userName)
-              localStorage.setItem('password', accountData.password)
-              localStorage.setItem('keepPassword', 'true')
-            } else {
-              //未记住密码逻辑
-              localStorage.removeItem('username')
-              localStorage.removeItem('password')
-              localStorage.removeItem('keepPassword')
-            }
-          })
-      } else {
-        //手机号登录逻辑
-        ElMessage.warning('手机号登录暂未开放')
-      }
-    } else {
-      ElMessage.error('请输入正确信息')
+async function submit() {
+  //账号密码登录逻辑
+  if (selectTab.value === 'account') {
+    //表单验证
+    try {
+      await accountForm.value?.validate()
+    } catch (err: any) {
+      ElMessage.error('表单验证失败' + err.message)
+      return
     }
-  })
+
+    //调用action方法
+    loginStore
+      .loginAccountAction({
+        username: accountData.userName,
+        password: accountData.password,
+      })
+      .then(() => {
+        //登录成功
+        if (props.keepPassword) {
+          //记住密码逻辑
+          localStorage.setItem('username', accountData.userName)
+          localStorage.setItem('password', accountData.password)
+          localStorage.setItem('keepPassword', 'true')
+        } else {
+          //未记住密码逻辑
+          localStorage.removeItem('username')
+          localStorage.removeItem('password')
+          localStorage.removeItem('keepPassword')
+        }
+      })
+      .catch((err) => {
+        ElMessage.error(err.message)
+      })
+  } else {
+    //手机号登录逻辑
+    ElMessage.warning('手机号登录暂未开放')
+  }
 }
 
 //暴露给父组件的方法
