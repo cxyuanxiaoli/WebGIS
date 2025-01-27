@@ -2,7 +2,7 @@
   <div class="homeAside">
     <div class="logo">
       <img src="@/assets/img/logo.svg" />
-      <h3>Vue-Ts-CMS</h3>
+      <h3 v-show="!isCollapse">Vue-Ts-CMS</h3>
     </div>
     <div class="menu">
       <!-- 菜单 -->
@@ -11,6 +11,7 @@
         background-color="#001529"
         :default-active="`${menu[0].children[0].id}`"
         text-color="#fff"
+        :collapse="isCollapse"
       >
         <template v-for="item in menu" :key="item.id">
           <!-- 动态渲染菜单项 -->
@@ -23,8 +24,11 @@
               v-for="subItem in item.children"
               :key="subItem.id"
               :index="subItem.id + ''"
+              class="menuItem"
             >
-              {{ subItem.name }}
+              <RouterLink :to="{ name: subItem.urlName }" active-class="active">{{
+                subItem.name
+              }}</RouterLink>
             </el-menu-item>
           </el-sub-menu>
         </template>
@@ -35,30 +39,43 @@
 
 <script lang="ts" setup>
 import { useLoginStore } from '@/store/login'
+import { RouterLink } from 'vue-router'
 
 const loginStore = useLoginStore()
 //获取用户权限菜单
 const menu = loginStore.userInfo.menus
+
+defineProps(['isCollapse'])
 </script>
 
 <style scoped>
 .homeAside {
   height: 100%;
+  width: 100%;
   background-color: #001529;
-  padding-top: 5%;
-  box-sizing: border-box;
   overflow: hidden;
 }
 
 .logo {
+  height: 8%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  margin-bottom: 5%;
+  padding: 5% 0;
   img {
-    width: 15%;
+    height: 60%;
     margin-right: 5%;
+  }
+}
+
+.menuItem {
+  a {
+    text-decoration: none;
+    color: white;
+  }
+  .active {
+    color: #ff9940;
   }
 }
 </style>

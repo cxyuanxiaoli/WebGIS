@@ -14,6 +14,13 @@ const db = {
           role: "admin",
           menus: [],
         },
+        {
+          id: 2,
+          username: "user123",
+          password: "123456",
+          role: "user",
+          menus: [],
+        },
       ],
     },
     //table 2: roles
@@ -24,7 +31,11 @@ const db = {
       columns: [
         {
           role: "admin",
-          menus: [1, 2, 4],
+          menus: [1, 2, 3, 4],
+        },
+        {
+          role: "user",
+          menus: [1, 3, 4],
         },
       ],
     },
@@ -40,10 +51,12 @@ const db = {
             {
               id: 11,
               name: "核心技术",
+              urlName: "CoreTechnology",
               children: null,
             },
             {
               id: 12,
+              urlName: "GoodStatic",
               name: "商品统计",
               children: null,
             },
@@ -57,21 +70,25 @@ const db = {
             {
               id: 21,
               name: "用户管理",
+              urlName: "UserManage",
               children: null,
             },
             {
               id: 22,
               name: "部门管理",
+              urlName: "DepartManage",
               children: null,
             },
             {
               id: 23,
               name: "菜单管理",
+              urlName: "MenuManage",
               children: null,
             },
             {
               id: 24,
               name: "角色管理",
+              urlName: "RoleManage",
               children: null,
             },
           ],
@@ -84,11 +101,13 @@ const db = {
             {
               id: 31,
               name: "商品类别",
+              urlName: "GoodsCategory",
               children: null,
             },
             {
               id: 32,
               name: "商品信息",
+              urlName: "GoodsInfo",
               children: null,
             },
           ],
@@ -101,11 +120,13 @@ const db = {
             {
               id: 41,
               name: "你的故事",
+              urlName: "YourStory",
               children: null,
             },
             {
               id: 42,
               name: "故事列表",
+              urlName: "StoryList",
               children: null,
             },
           ],

@@ -1,11 +1,18 @@
 <template>
-  <div class="homeMain"></div>
+  <div class="homeMain">
+    <RouterView />
+  </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { RouterView } from 'vue-router'
+</script>
 
 <style scoped>
 .homeMain {
-  color: aliceblue;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border-radius: 8px;
 }
 </style>

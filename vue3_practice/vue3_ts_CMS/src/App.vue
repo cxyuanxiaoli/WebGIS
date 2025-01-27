@@ -20,6 +20,6 @@ test()
 .app {
   width: 100vw;
   height: 100vh;
-  background-color: skyblue;
+  background-color: rgb(230, 230, 230);
 }
 </style>
