@@ -1331,6 +1331,653 @@ export const useLoveTalkStore = defineStore('loveTalk', () => {
 
 
 
+## Vue3 组件通信
+
+### props
+
+概述：`props`是使用频率最高的一种通信方式，常用于：父传子，子传父
+
+* 父传子：属性值是非函数
+* 子传父：属性值是函数
+
+父传子：
+
+```vue
+//父组件
+<template>
+  <div class='main'>
+    <div class="father">
+      <h3>父组件</h3>
+      <h4>汽车：{{ car }}</h4>
+      <PropsSon :car="car" />
+    </div>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import PropsSon from '@/components/PropsSon.vue';
+import { ref } from 'vue';
+
+const car = ref('宝马');
+</script>
+
+//子组件
+<template>
+  <div class='main'>
+    <h3>子组件</h3>
+    <h4>玩具：{{ toy }}</h4>
+    <h4>父亲的车：{{ car }}</h4>
+  </div>
+</template>
+
+<script lang='ts' setup>
+defineProps(['car'])
+</script>
+```
+
+子传父：
+
+```vue
+//父组件
+<template>
+  <div class='main'>
+    <div class="father">
+      <h3>父组件</h3>
+      <h4 v-show="sonToy">玩具：{{ sonToy }}</h4>
+      <PropsSon :sendToy="getToy" />
+    </div>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import PropsSon from '@/components/PropsSon.vue';
+import { ref } from 'vue';
+
+const sonToy = ref('');
+function getToy(value: string) {
+  sonToy.value = value;
+}
+</script>
+
+//子组件
+<template>
+  <div class='main'>
+    <h3>子组件</h3>
+    <h4>玩具：{{ toy }}</h4>
+    <button @click="sendToy(toy)"> 给父亲玩具 </button>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import { ref } from 'vue'
+
+const toy = ref('atm')
+defineProps(['sendToy'])
+</script>
+```
+
+### 自定义事件
+
+自定义事件用于组件通信-子传父
+
+```vue
+//父组件
+<template>
+  <div class='custom-event'>
+    <div class="father">
+      <h3>父组件</h3>
+      <h4 v-show="sonToy">子组件的玩具：{{ sonToy }}</h4>
+      <CustomEventSon @send-toy="getToy" />
+    </div>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import CustomEventSon from '@/components/CustomEventSon.vue';
+import { ref } from 'vue'
+
+const sonToy = ref('')
+function getToy(toy: string) {
+  sonToy.value = toy
+}
+</script>
+
+//子组件
+<template>
+  <div class='custom-event-son'>
+    <h3>子组件</h3>
+    <h4>玩具：{{ toy }}</h4>
+    <button @click="emit('send-toy', toy)">点击发送玩具</button>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import { ref } from 'vue'
+
+let toy = ref('atm')
+const emit = defineEmits(['send-toy'])
+</script>
+```
+
+$event  事件对象
+
+​		当事件回调函数不进行传参时，默认会存在一个参数，即事件对象；当传参时，事件对象会丢失，需要使用$event为事件对象占位。
+
+```js
+<template>
+<button @click="handleClick(1, $event)"> click</button>
+</template>
+
+<script lang='ts' setup>
+function handleClick(a: any, b: any) {
+  console.log(a, b);
+}
+</script>
+```
+
+### mitt
+
+任意组件通信
+
+```ts
+//@/utils/emitter.ts
+import mitt from "mitt";
+const emitter = mitt();
+export default emitter;
+```
+
+* emitter.on( )     绑定事件
+* emitter.off( )     解绑事件
+* emitter.emit( )  触发事件
+* emitter.all( )      拿到所有事件
+
+```vue
+<template>
+  <div class='mitt'>
+    <h3>父组件</h3>
+    <MittSon1 />
+    <MittSon2 />
+  </div>
+</template>
+<script lang='ts' setup>
+import MittSon1 from '@/components/MittSon1.vue';
+import MittSon2 from '@/components/MittSon2.vue';
+</script>
+
+<template>
+  <div class='mitt-son1'>
+    <h3>子组件1</h3>
+    <h4>玩具：{{ toy }}</h4>
+    <button @click="emitter.emit('send-toy', toy)">点击</button>
+  </div>
+</template>
+<script lang='ts' setup>
+import { ref } from 'vue'
+import emitter from '@/utils/emitter';
+const toy = ref('atm')
+</script>
+
+<template>
+  <div class='mittSon2'>
+    <h3>子组件2</h3>
+    <h4 v-show="son1Toy">兄弟组件的玩具：{{ son1Toy }}</h4>
+  </div>
+</template>
+<script lang='ts' setup>
+import { ref, onUnmounted } from 'vue'
+import emitter from '@/utils/emitter';
+const son1Toy = ref('')
+emitter.on('send-toy', (toy: any) => {
+  son1Toy.value = toy
+  console.log(toy);
+})
+onUnmounted(() => {
+  emitter.off('send-toy')
+})
+</script>
+```
+
+### v-model
+
+#### v-model作用于原始html元素
+
+1. 用法：
+
+   ```html
+   <input type="text" v-model="name">
+   ```
+
+2. 实现原理：
+
+   ```html
+     <input type="text" :value="name" @input="name = (<HTMLInputElement>$event.target).value">
+   ```
+
+#### v-model作用于自定义组件
+
+1. 用法：
+
+   ```vue
+   <MyInput v-model="name" />
+   ```
+
+2. 实现原理：
+
+   * 底层自动转换为 props和自定义事件emit
+
+     ```vue
+     <MyInput :modelValue="name" @update:modelValue="name = $event" />
+     ```
+
+   * 自定义组件内部逻辑手动实现
+
+     ```vue
+     //MyInput.vue
+     <template>
+       <div class='my-input'>
+         <input type="text" :value="modelValue" @input="$emit('update:modelValue', (<HTMLInputElement>$event.target).value)">
+       </div>
+     </template>
+     
+     <script lang='ts' setup>
+     defineProps(['modelValue'])
+     const emit = defineEmits(['update:modelValue'])
+     </script>
+     ```
+
+3. $event
+
+   * 在元素html标签中$event表示触发事件的事件对象
+   * 在自定义组件标签中$event表示自定义事件的传参
+
+4. 通过v-model双向绑定多个值
+
+   * 写法
+
+     ```vue
+     <MyInput v-model:name="name" v-model:password="password" />
+     ```
+
+   * 自定义组件内部实现
+
+     ```vue
+     <template>
+       <div class='my-input'>
+         <input type="text" :value="name" @input="$emit('update:name', (<HTMLInputElement>$event.target).value)">
+         <br>
+         <input type="text" :value="password" @input="$emit('update:password', (<HTMLInputElement>$event.target).value)">
+       </div>
+     </template>
+     
+     <script lang='ts' setup>
+     defineProps(['name', 'password'])
+     const emit = defineEmits(['update:name', 'update:password'])
+     </script>
+     ```
+
+### $attrs
+
+$attrs用于实现当前组件的父组件，向当前组件的子组件通信（祖->孙）
+
+$attrs是一个对象，包含所有父组件传入的标签属性，$attrs会自动排除props中声明的属性（可以认为声明过的props被子组件自己‘消费’了）
+
+实现：
+
+1. 父组件
+
+   ```vue
+   <template>
+     <div class='attrs'>
+       <h4>父组件</h4>
+       <h5>a: {{ a }}</h5>
+       <h5>b: {{ b }}</h5>
+       <AttrsSon :a="a" :b="b" v-bind="{ x: 100, y: 200 }" />
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import AttrsSon from '@/components/AttrsSon.vue';
+   import { ref } from 'vue';
+   const a = ref(10);
+   const b = ref(20);
+   </script>
+   ```
+
+2. 子组件
+
+   ```vue
+   <template>
+     <div class='attrs-son'>
+       <h4>子组件</h4>
+       <AttrsGrandchild v-bind="$attrs" />
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import AttrsGrandchild from './AttrsGrandchild.vue';
+   </script>
+   ```
+
+3. 孙组件
+
+   ```vue
+   <template>
+     <div class='attrs-grandchild'>
+       <h4>孙组件</h4>
+       <h5>a:{{ a }}</h5>
+       <h5>b:{{ b }}</h5>
+       <h5>x:{{ x }}</h5>
+       <h5>y:{{ y }}</h5>
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   defineProps(['a', 'b', 'x', 'y'])
+   </script>
+   ```
+
+
+### $refs and $parent
+
+$refs用于父传子
+
+$parent用于子传父
+
+$refs: 值为对象，包含所有被ref属性标识的Dom元素或组件实例
+
+$parent: 值为对象，当前组件的父组件实例对象
+
+1. $refs
+
+   定义子组件数据并暴露
+
+   ```vue
+   <script lang='ts' setup>
+   import { ref } from 'vue'
+   
+   const book = ref(3)
+   defineExpose({ book })
+   </script>
+   ```
+
+   在父组件中为子组件打上ref标签，使用$refs获取所有组件实例
+
+   ```vue
+   <template>
+     <div class='refs-parent'>
+       <h3>父组件</h3>
+       <button @click="addBook($refs)">增加所有子组件book数量</button>
+       <RefsParentChild1 ref="c1" />
+       <RefsParentChild2 ref="c2" />
+       <div ref="div"></div>
+     </div>
+   </template>
+   ```
+
+   编写对应方法修改子组件数据
+
+   ```vue
+   <script lang='ts' setup>
+   function addBook(value: any) {
+     for (let key in value) {
+       value[key].book += 1;
+     }
+   }
+   </script>
+   ```
+
+2. $parent
+
+   父组件中定义数据并暴露
+
+   ```vue
+   <template>
+     <div class='refs-parent'>
+       <h3>父组件</h3>
+       <h4>房产：{{ house }}</h4>
+       <RefsParentChild1 ref="c1" />
+       <RefsParentChild2 ref="c2" />
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import RefsParentChild1 from '@/components/RefsParentChild1.vue';
+   import RefsParentChild2 from '@/components/RefsParentChild2.vue';
+   import { ref } from 'vue';
+   
+   const c1 = ref();
+   const c2 = ref();
+   const house = ref(4)
+   defineExpose({ house })
+   </script>
+   ```
+
+   子组件中获取父组件实例并修改父组件数据
+
+   ```vue
+   <template>
+     <div class='child1'>
+       <h3>子组件1</h3>
+       <h4>书：{{ book }}本</h4>
+       <button @click="minusHouse($parent)">点击父组件房产减少</button>
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import { ref } from 'vue'
+   
+   const book = ref(3)
+   defineExpose({ book })
+   
+   function minusHouse(parent: any) {
+     parent.house -= 1
+   }
+   </script>
+   ```
+
+### provide and inject
+
+实现组件与其后代组件通信，不会影响到中间组件
+
+* import { provide, inject } from 'vue'
+* provide(key,value)     // key 数据名，字符串         value 值
+* inject(key,defaultValue)    // key  对应provide的key       defaultValue   默认值
+
+1. 定义父组件数据并向后代提供数据
+
+   ```vue
+   <template>
+     <div class='provide-inject'>
+       <h3>父组件</h3>
+       <h4>银子: {{ money }}</h4>
+       <h4>汽车: 一辆{{ car.brand }}, 价值 {{ car.price }}</h4>
+       <ProvideSon />
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import ProvideSon from '@/components/ProvideSon.vue';
+   import { ref, reactive, provide } from 'vue';
+   
+   const money = ref(1000);
+   const car = reactive({
+     brand: 'BMW',
+     price: 100000
+   })
+   provide('money', money)
+   provide('car', car)
+   </script>
+   ```
+
+2. 在后代组件接收数据
+
+   ```vue
+   <template>
+     <div class='provide-grandchild'>
+       <h3>孙组件</h3>
+       <p>父组件提供的钱：{{ money }}</p>
+       <p>父组件提供的车：一辆{{ car.brand }}, 价值{{ car.price }}</p>
+     </div>
+   </template>
+   
+   <script lang='ts' setup>
+   import { inject } from 'vue';
+   
+   const money = inject('money', 0);
+   const car = inject('car', { brand: '', price: 0 });
+   </script>
+   ```
+
+### pinia
+
+### slot
+
+#### 默认插槽
+
+在子组件中使用 slot 占位，在父组件中定义样式填充。
+
+```vue
+<template>
+  <div class='slot-default'>
+    <h3>{{ title }}</h3>
+    <slot>默认内容</slot>
+  </div>
+</template>
+
+<script lang='ts' setup>
+defineProps(['title'])
+</script>
+```
+
+```vue
+<template>
+  <div class='slot'>
+    <h3>父组件</h3>
+    <div class="content">
+      <SlotDefault title="热门游戏列表">
+        <ul v-for="game in games" :key="game.id">
+          <li>{{ game.name }}</li>
+        </ul>
+      </SlotDefault>
+      <SlotDefault title="今日美食城市">
+        <img :src="imgUrl" alt="">
+      </SlotDefault>
+      <SlotDefault title="今日影视推荐">
+        <video :src="videoUrl" controls></video>
+      </SlotDefault>
+    </div>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import SlotDefault from '@/components/SlotDefault.vue';
+
+const games = [{ id: 1, name: '王者荣耀' }, { id: 2, name: '绝地求生' }, { id: 3, name: '英雄联盟' }, { id: 4, name: 'DOTA2' }]
+const imgUrl = 'https://z1.ax1x.com/2023/11/19/piNxLo4.jpg'
+const videoUrl = 'http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2021/12/16/QiangGuoLunTan-ZhouJing_bb603bf08843f480355ee52737b6a27c_ms_hd.mp4'
+</script>
+```
+
+#### 具名插槽
+
+通过使用具名插槽可以在子组件中定义多个插槽进行占位并通过 name 属性区分，在父组件中使用 template 并使用 `v-slot: name` 指定插槽名填充特定结构。
+
+默认插槽 name 属性为 default ；使用具名插槽时 `v-slot:name` 可以简写为 `#name`
+
+```vue
+<template>
+  <div class='slot-name'>
+    <slot name="header">默认标题</slot>
+    <slot name="content">默认内容</slot>
+  </div>
+</template>
+```
+
+```vue
+<template>
+  <div class='slot'>
+    <h3>父组件</h3>
+    <div class="content">
+      <SlotName>
+        <template v-slot:header>
+          <h4>具名插槽</h4>
+        </template>
+        <template #content>   <!-- 简写 -->
+          <p>具名插槽内容</p>
+        </template>
+      </SlotName>
+    </div>
+  </div>
+</template>
+```
+
+#### 作用域插槽
+
+数据在子组件中维护，但根据数据生成什么样的结构由父组件决定。
+
+子组件通过为 slot 定义属性传递数据，父组件使用 template 并通过 `v-slot="data"` 接收数据；搭配具名插槽使用时通过 `v-slot:name="data"` 接收数据，简写为 `#name="data"`
+
+子组件：
+
+```vue
+<template>
+  <div class='slot-scope'>
+    <h3>日期列表</h3>
+    <slot :days="dayList"></slot>      <!-- 使用作用域插槽传递数据 --> 
+  </div>
+</template>
+
+<script lang='ts' setup>
+import { reactive } from 'vue';
+
+const dayList = reactive(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+</script>
+```
+
+父组件：
+
+```vue
+<template>
+  <div class='slot'>
+    <h3>父组件</h3>
+    <!-- 作用域插槽 -->
+    <div class="content3">
+      <Slotscope>
+        <template v-slot="params">      <!-- 接收数据 -->
+          <ul>
+            <li v-for="(day, index) in params.days" :key="index">{{ day }}</li>
+          </ul>
+        </template>
+      </Slotscope>
+      <Slotscope>
+        <template v-slot="{ days }">   <!-- 接收数据并解构 -->
+          <ol>
+            <li v-for="(day, index) in days" :key="index">{{ day }}</li>
+          </ol>
+        </template>
+      </Slotscope>
+      <Slotscope>
+        <template #default="{ days }">    <!-- 简写形式，默认插槽name属性为default -->
+          <h6 v-for="(day, index) in days" :key="index">{{ day }}></h6>
+        </template>
+      </Slotscope>
+    </div>
+  </div>
+</template>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
