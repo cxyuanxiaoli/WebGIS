@@ -14,6 +14,8 @@
     <LifeCycle v-if="flag"></LifeCycle>
     <button @click="changeShow">unmounte lifecycle</button>
     <Hooks></Hooks>
+    <OthersApi></OthersApi>
+    <TeleportTest></TeleportTest>
   </div>
 
 </template>
@@ -51,6 +53,8 @@ import { type PersonList } from '@/types'
 import LifeCycle from './components/LifeCycle.vue'
 import { onBeforeMount, onMounted } from 'vue'
 import Hooks from './components/Hooks.vue'
+import OthersApi from './components/OthersApi.vue'
+import TeleportTest from './components/TeleportTest.vue'
 
 let refLabel = ref()
 function showComponent() {

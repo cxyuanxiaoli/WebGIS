@@ -1966,41 +1966,190 @@ const dayList = reactive(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
 </template>
 ```
 
+## 其他API
 
+### shallowRef and shallowReactive
 
+#### shallowRef
 
+1. 作用：创建一个响应式数据，但只对顶层属性进行响应式处理。
 
+2. 用法：
 
+   ```js
+   let myVar = shallowRef(value)
+   ```
 
+3. 特点：只跟踪引用值得变化，不关心值内部的属性变化。
 
+#### shallowReactive
 
+1. 作用：创建一个浅层响应对象，只会使对象的最顶层属性变成响应式的，对象内部的嵌套属性则不会变成响应式的。
 
+2. 用法：
 
+   ```js
+   const myObj = shallowReactive({...})
+   ```
 
+3. 特点：对象的顶层属性是响应式的，但嵌套对象的属性不是。
 
+### readonly and shallowReadonly
 
+#### readonly
 
+1. 作用：用于创建一个响应式对象的深只读副本。
 
+2. 用法：
 
+   ```js
+   const original = reactive({...})
+   const readonlyCopy = readonly(original)
+   ```
 
+3. 特点：
 
+   * 对象的所有嵌套属性都将变为只读
+   * 任何尝试修改这个对象的操作都会被阻止
 
+4. 应用场景：
 
+   * 创建不可变的状态快照
+   * 保护全局状态或配置不被修改
 
+#### shallowReadonly
 
+1. 作用：与readonly类似，但只作用于对象的顶层属性。
 
+2. 用法：
 
+   ```js
+   const original = reactive({...})
+   const readonlyCopy = shallowReadonly(original)
+   ```
 
+3. 特点：
 
+   * 只将对象的顶层属性设置为只读，对象内部的嵌套属性依然是可变的
+   * 适用于只保护对象顶层属性的场景
 
+### toRaw and markRaw
 
+#### toRaw
 
+1. 作用：用于获取一个响应式对象的原始数据，toRaw返回的对象不再是响应式的，不会触发视图更新
 
+2. 代码：
 
+   ```js
+   //toRaw
+   const obj3 = reactive({
+     a: 1,
+     b: 2,
+   })
+   const rawobj = toRaw(obj3)
+   
+   function printRawObj() {
+     rawobj.a += 2
+     console.log(obj3)    //Proxy(Object) {a: 3, b: 2}
+     console.log(rawobj)     //{a: 3, b: 2}
+   }
+   ```
 
+#### markRaw
 
+1. 作用：标记一个对象，使其永远不会变成响应式的
 
+2. 代码：
 
+   ```js
+   //markRaw
+   const obj4 = markRaw({
+     a: 1,
+     b: 2,
+   })
+   const markObj = reactive(obj4)
+   
+   function printMarkObj() {
+     console.log(markObj)    //{a: 1, b: 2, __v_skip: true}
+   }
+   ```
+
+### customRef
+
+作用：创建一个自定义的ref，并对其依赖项跟踪和更新触发进行逻辑控制。
+
+```ts
+import { customRef } from "vue";
+
+export default function useMsgRef(msg: string, delay: number) {
+  let timer: number;
+  let msg2Value = msg;
+  let msg2 = customRef((track, trigger) => {
+    return {
+      //被读取时调用
+      get() {
+        track(); //进行数据跟踪
+        return msg2Value;
+      },
+      //被修改时调用
+      set(value) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          msg2Value = value;
+          trigger(); //触发更新
+        }, delay);
+      },
+    };
+  });
+  return msg2;
+}
+```
+
+### Teleport
+
+`<Teleport>` 是一个内置组件，它可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
+
+```vue
+<template>
+  <div class='modal'>
+    <h3>Teleport</h3>
+    <button @click="visible = !visible">modal</button>
+    <Teleport to="body">
+      <div class="content" v-if="visible">
+        弹窗
+      </div>
+    </Teleport>
+  </div>
+</template>
+
+<script lang='ts' setup>
+import { ref } from 'vue'
+let visible = ref(false)
+</script>
+
+<style scoped>
+.modal {
+  background-color: grey;
+  border-radius: 10px;
+  box-shadow: 0 0 5px;
+  filter: saturate(50%);
+}
+.content {
+  width: 200px;
+  height: 200px;
+  background-color: skyblue;
+  border-radius: 10px;
+  box-shadow: 0 0 5px;
+  padding: 10px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+</style>
+```
 
 
 

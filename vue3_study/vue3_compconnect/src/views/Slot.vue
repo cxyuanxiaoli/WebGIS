@@ -60,7 +60,7 @@
 <script lang='ts' setup>
 import SlotDefault from '@/components/SlotDefault.vue';
 import SlotName from '@/components/SlotName.vue';
-import Slotscope from '@/components/Slotscope.vue';
+import Slotscope from '@/components/SlotScope.vue';
 
 const games = [{
   id: 1, name: '王者荣耀'
