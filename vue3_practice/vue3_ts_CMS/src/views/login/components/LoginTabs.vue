@@ -41,9 +41,9 @@
           </div>
         </template>
         <!-- 表单 -->
-        <el-form label-width="60px">
+        <el-form label-width="60px" :model="phoneData">
           <el-form-item label="手机号">
-            <el-input></el-input>
+            <el-input v-model="phoneData.code"></el-input>
           </el-form-item>
           <el-form-item label="验证码">
             <div class="verifyCode">
@@ -74,6 +74,9 @@ const props = defineProps(['keepPassword'])
 const accountData = reactive({
   userName: localStorage.getItem('username') || '',
   password: localStorage.getItem('password') || '',
+})
+const phoneData = reactive({
+  code: '',
 })
 
 //表单验证规则

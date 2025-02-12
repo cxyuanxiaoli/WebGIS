@@ -10,5 +10,6 @@
 
 <style scoped>
 .coreTechnology {
+  background-color: #854646;
 }
 </style>

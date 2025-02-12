@@ -5,7 +5,17 @@
       <el-icon size="30px" @click="changeMenu" class="iconFold">
         <component :is="isFold ? 'Fold' : 'Expand'"></component>
       </el-icon>
-      <div>面包屑</div>
+      <div>
+        <el-breadcrumb separator-icon="ArrowRightBold">
+          <el-breadcrumb-item
+            v-for="item in breadcrumb"
+            :key="item.id"
+            :to="{ name: item.pathName }"
+          >
+            {{ item.label }}
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
     </div>
     <!-- 右侧控制按钮 -->
     <div class="right">
@@ -41,26 +51,34 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { computed, ref } from 'vue'
 import { useLoginStore } from '@/store/login'
 import { storeToRefs } from 'pinia'
+import { mapPathToBreadcrumb } from '@/utils/mapMenus'
 
 const router = useRouter()
 const isFold = ref(false)
 const { userInfo } = storeToRefs(useLoginStore())
-
 const emits = defineEmits(['foldMenu'])
 
+//展开/收起菜单
 function changeMenu() {
   isFold.value = !isFold.value
   emits('foldMenu', isFold.value)
 }
-
+//退出登录
 function checkOut() {
   localStorage.removeItem('token')
+  localStorage.removeItem('userInfo')
   router.push('/login')
 }
+
+const route = useRoute()
+//面包屑获取, 监听路由变化
+const breadcrumb = computed(() => {
+  return mapPathToBreadcrumb(route.name, userInfo.value.menus)
+})
 </script>
 
 <style scoped>

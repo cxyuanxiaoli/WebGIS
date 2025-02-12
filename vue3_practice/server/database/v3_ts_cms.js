@@ -21,6 +21,13 @@ const db = {
           role: "user",
           menus: [],
         },
+        {
+          id: 3,
+          username: "guest123",
+          password: "123456",
+          role: "guest",
+          menus: [],
+        },
       ],
     },
     //table 2: roles
@@ -36,6 +43,10 @@ const db = {
         {
           role: "user",
           menus: [1, 3, 4],
+        },
+        {
+          role: "guest",
+          menus: [1, 4],
         },
       ],
     },

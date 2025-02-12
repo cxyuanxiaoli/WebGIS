@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '@/views/login/Login.vue'
-import NotFound from '@/views/notfound/NotFound.vue'
 import { tokenTestRequest } from '@/request/login'
 import { ElMessage } from 'element-plus'
 
@@ -16,67 +14,16 @@ const router = createRouter({
       path: '/home',
       redirect: '/home/coretech',
       component: () => import('@/views/home/Home.vue'),
-      children: [
-        {
-          name: 'CoreTechnology',
-          path: 'coretech',
-          component: () => import('@/views/homeMain/systemView/CoreTechnology.vue'),
-        },
-        {
-          name: 'GoodStatic',
-          path: 'goodsta',
-          component: () => import('@/views/homeMain/systemView/GoodStatic.vue'),
-        },
-        {
-          name: 'UserManage',
-          path: 'usermana',
-          component: () => import('@/views/homeMain/systemManage/UserManage.vue'),
-        },
-        {
-          name: 'DepartManage',
-          path: 'departmana',
-          component: () => import('@/views/homeMain/systemManage/DepartManage.vue'),
-        },
-        {
-          name: 'MenuManage',
-          path: 'menumana',
-          component: () => import('@/views/homeMain/systemManage/MenuManage.vue'),
-        },
-        {
-          name: 'RoleManage',
-          path: 'rolemana',
-          component: () => import('@/views/homeMain/systemManage/RoleManage.vue'),
-        },
-        {
-          name: 'GoodsCategory',
-          path: 'goodscate',
-          component: () => import('@/views/homeMain/goodCenter/GoodsCategory.vue'),
-        },
-        {
-          name: 'GoodsInfo',
-          path: 'goodsinfo',
-          component: () => import('@/views/homeMain/goodCenter/GoodsInfo.vue'),
-        },
-        {
-          name: 'YourStory',
-          path: 'yoursto',
-          component: () => import('@/views/homeMain/sayTalks/YourStory.vue'),
-        },
-        {
-          name: 'StoryList',
-          path: 'storyli',
-          component: () => import('@/views/homeMain/sayTalks/StoryList.vue'),
-        },
-      ],
+      children: [],
     },
     {
       name: 'Login',
       path: '/login',
-      component: Login,
+      component: () => import('@/views/login/Login.vue'),
     },
     {
       path: '/:pathMatch(.*)',
-      component: NotFound,
+      component: () => import('@/views/notfound/NotFound.vue'),
     },
   ],
 })

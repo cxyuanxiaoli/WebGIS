@@ -280,63 +280,96 @@ const accountRules: FormRules = {
 
 ### 登录逻辑实现及状态保存
 
+```ts
+// request/login/index.ts
+import { request } from '..'
+import { type IAccount } from '@/types'
+//登录接口
+export async function loginRequest(account: IAccount) {
+  const res = (await request.post('/login', account)) as any
+  return res
+}
+//获取用户信息接口
+export async function userinfoRequest(id: number) {
+  const res = (await request.get(`/user/${id}`)) as any
+  return res
+}
+//检验token有效性接口
+export async function tokenTestRequest() {
+  await request.get('/test2')
+}
+```
+
 ```js
+// views/login/components/LoginTabs.vue
 //登录按钮逻辑
-function submit() {
-  //表单验证
-  accountForm.value?.validate((valid) => {
-    if (valid) {
-      //账号密码登录逻辑
-      if (selectTab.value === 'account') {
-        //调用action方法
-        loginStore
-          .loginAccountAction({
-            username: accountData.userName,
-            password: accountData.password,
-          })
-          .then(() => {
-            //登录成功
-            if (props.keepPassword) {
-              //记住密码逻辑
-              localStorage.setItem('username', accountData.userName)
-              localStorage.setItem('password', accountData.password)
-              localStorage.setItem('keepPassword', 'true')
-            } else {
-              //未记住密码逻辑
-              localStorage.removeItem('username')
-              localStorage.removeItem('password')
-              localStorage.removeItem('keepPassword')
-            }
-          })
-      } else {
-        //手机号登录逻辑
-        ElMessage.warning('手机号登录暂未开放')
-      }
-    } else {
-      ElMessage.error('请输入正确信息')
+async function submit() {
+  //账号密码登录逻辑
+  if (selectTab.value === 'account') {
+    //表单验证
+    try {
+      await accountForm.value?.validate()
+    } catch (err: any) {
+      ElMessage.error('表单验证失败' + err.message)
+      return
     }
-  })
+
+    //调用action方法
+    loginStore
+      .loginAccountAction({
+        username: accountData.userName,
+        password: accountData.password,
+      })
+      .then(() => {
+        //登录成功
+        if (props.keepPassword) {
+          //记住密码逻辑
+          localStorage.setItem('username', accountData.userName)
+          localStorage.setItem('password', accountData.password)
+          localStorage.setItem('keepPassword', 'true')
+        } else {
+          //未记住密码逻辑
+          localStorage.removeItem('username')
+          localStorage.removeItem('password')
+          localStorage.removeItem('keepPassword')
+        }
+      })
+      .catch((err) => {
+        ElMessage.error(err.message)
+      })
+  } else {
+    //手机号登录逻辑
+    ElMessage.warning('手机号登录暂未开放')
+  }
 }
 ```
 
 ```ts
+// store/login.ts
 async function loginAccountAction(account: IAccount) {
     //发送请求得到结果
-    const res = await accountRequest(account)
+    const res = await loginRequest(account)
     //登录成功
     if (res.code === 0) {
       //存储用户信息及状态
       id.value = res.data.id
-      name.value = res.data.name
       token.value = res.data.token
       //本地存储token
       localStorage.setItem('token', token.value)
+      //获取用户信息
+      const info = await userinfoRequest(id.value)
+      if (info.code === 0) {
+        //成功获取用户信息
+        userInfo.value = info.data
+        localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+      } else {
+        return Promise.reject(Error(info.message))
+      }
       //跳转到首页
       router.push('/home')
     } else {
       //登录失败
-      ElMessage.error(res.message)
-      return Promise.reject()
+      return Promise.reject(Error(res.message))
     }
   }
 ```
@@ -345,11 +378,20 @@ async function loginAccountAction(account: IAccount) {
 
 ```ts
 //  @/router/index.ts
-//确定用户是否登录
-router.beforeEach((to) => {
+//确定用户是否登录及token有效性
+router.beforeEach(async (to) => {
   const token = localStorage.getItem('token')
-  if (to.path === '/home' && !token) {
-    return '/login'
+  if (to.path.startsWith('/home')) {
+    if (!token) {
+      return '/login'
+    } else {
+      try {
+        await tokenTestRequest()
+      } catch (err: any) {
+        ElMessage.error(err.message)
+        return '/login'
+      }
+    }
   }
 })
 ```
@@ -368,12 +410,468 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 function checkOut() {
   localStorage.removeItem('token')   //清除本地token
+  localStorage.removeItem('userInfo')
   router.push('/login')     //跳转页面
 }
 </script>
 ```
 
 ### 信息本地缓存
+
+## 主页搭建
+
+### 页面布局
+
+```vue
+<template>
+  <div class="home">
+    <el-container style="height: 100%">
+      <el-aside width="200px" class="homeAside">
+        <HomeAside />
+      </el-aside>
+      <el-container>
+        <el-header class="header">
+          <HomeHeader />
+        </el-header>
+        <el-main class="main">
+          <HomeMain />
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import HomeAside from './components/HomeAside.vue'
+import HomeHeader from './components/HomeHeader.vue'
+import HomeMain from './components/HomeMain.vue'
+</script>
+```
+
+### 菜单栏搭建
+
+```vue
+<template>
+  <div class="homeAside">
+    <div class="logo">
+      <img src="@/assets/img/logo.svg" />
+      <h3>Vue-Ts-CMS</h3>
+    </div>
+    <div class="menu">
+      <!-- 菜单 -->
+      <el-menu
+        active-text-color="#ffd04b"
+        background-color="#001529"
+        :default-active="`${menu[0].children[0].id}`"
+        text-color="#fff"
+      >
+        <template v-for="item in menu" :key="item.id">
+          <!-- 动态渲染菜单项 -->
+          <el-sub-menu :index="item.id + ''">
+            <template #title>
+              <el-icon><component :is="item.icon"></component></el-icon>
+              <span>{{ item.name }}</span>
+            </template>
+            <el-menu-item
+              v-for="subItem in item.children"
+              :key="subItem.id"
+              :index="subItem.id + ''"
+              class="menuItem"
+            >
+              <RouterLink :to="{ name: subItem.urlName }" active-class="active">{{
+                subItem.name
+              }}</RouterLink>
+            </el-menu-item>
+          </el-sub-menu>
+        </template>
+      </el-menu>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { useLoginStore } from '@/store/login'
+import { RouterLink } from 'vue-router'
+
+const loginStore = useLoginStore()
+//获取用户权限菜单
+const menu = loginStore.userInfo.menus
+</script>
+```
+
+### 顶部搭建
+
+```vue
+<template>
+  <div class="homeHeader">
+    <!-- 展开/收起菜单  面包屑 -->
+    <div class="left">
+      <el-icon size="30px" class="iconFold">
+        <component is="Expand"></component>
+      </el-icon>
+      <div>
+        面包屑
+      </div>
+    </div>
+    <!-- 右侧控制按钮 -->
+    <div class="right">
+      <el-icon size="25px" class="iconControl"><Message /></el-icon>
+      <el-icon size="25px" class="iconControl"><Notebook /></el-icon>
+      <el-icon size="25px" class="iconControl"><TurnOff /></el-icon>
+      <div class="iconControl">
+        <!-- 头像 -->
+        <el-avatar :size="35" src="" />
+        <!-- 下拉菜单 -->
+        <el-dropdown>
+          <span class="userName"> {{ userInfo.username }} </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>
+                <el-icon><User /></el-icon>
+                个人信息
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-icon><Lock /></el-icon>
+                忘记密码
+              </el-dropdown-item>
+              <el-dropdown-item @click="checkOut" divided>
+                <el-icon><CloseBold /></el-icon>
+                退出登录
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useLoginStore } from '@/store/login'
+import { storeToRefs } from 'pinia'
+
+const router = useRouter()
+const { userInfo } = storeToRefs(useLoginStore())
+//退出登录
+function checkOut() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('userInfo')
+  router.push('/login')
+}
+</script>
+```
+
+### 内容区搭建
+
+```vue
+<template>
+  <div class="homeMain">
+    <RouterView />
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { RouterView } from 'vue-router'
+</script>
+```
+
+### 路由配置
+
+```ts
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/',
+      redirect: '/home',
+    },
+    {
+      name: 'Home',
+      path: '/home',
+      redirect: '/home/coretech',
+      component: () => import('@/views/home/Home.vue'),
+      children: [
+        {
+    		name: 'CoreTechnology',
+    		path: '/home/coretech',
+    		component: () => import('@/views/homeMain/systemView/CoreTechnology.vue'),
+  		},{
+    		name: 'GoodStatic',
+    		path: '/home/goodsta',
+    		component: () => import('@/views/homeMain/systemView/GoodStatic.vue'),
+  		},
+        .......   //其他路由
+      ],
+    },
+    {
+      name: 'Login',
+      path: '/login',
+      component: () => import('@/views/login/Login.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)',
+      component: () => import('@/views/notfound/NotFound.vue'),
+    },
+  ],
+})
+```
+
+### 菜单的折叠/展开
+
+
+
+## 动态路由
+
+静态路由的问题：注册了所有的路由，用户可通过直接输入路由以访问到无访问权限的页面
+
+### 动态路由
+
+通过用户的菜单信息动态地进行路由注册
+
+设置动态路由的时机：
+
+* 用户登录成功后
+* 用户登录状态下刷新页面（因为刷新页面动态路由会丢失）
+
+### 路由的抽取
+
+将各权限菜单对应的各路由提取到各文件中
+
+例如：
+
+```ts
+//   router/home/systemView/index.ts
+import { type RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
+  {
+    name: 'CoreTechnology',
+    path: '/home/coretech',
+    component: () => import('@/views/homeMain/systemView/CoreTechnology.vue'),
+  },
+  {
+    name: 'GoodStatic',
+    path: '/home/goodsta',
+    component: () => import('@/views/homeMain/systemView/GoodStatic.vue'),
+  },
+]
+export default routes
+```
+
+### 用户菜单映射为路由对象数组
+
+后端返回的用户菜单
+
+```json
+[
+  {
+    "id": 1,
+    "name": "系统总览",
+    "icon": "House",
+    "children": [
+      { "id": 11, "name": "核心技术", "urlName": "CoreTechnology", "children": null },
+      { "id": 12, "urlName": "GoodStatic", "name": "商品统计", "children": null }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "系统管理",
+    "icon": "Edit",
+    "children": [
+      { "id": 21, "name": "用户管理", "urlName": "UserManage", "children": null },
+      { "id": 22, "name": "部门管理", "urlName": "DepartManage", "children": null },
+      { "id": 23, "name": "菜单管理", "urlName": "MenuManage", "children": null },
+      { "id": 24, "name": "角色管理", "urlName": "RoleManage", "children": null }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "商品中心",
+    "icon": "ShoppingCart",
+    "children": [
+      { "id": 31, "name": "商品类别", "urlName": "GoodsCategory", "children": null },
+      { "id": 32, "name": "商品信息", "urlName": "GoodsInfo", "children": null }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "随便聊聊",
+    "icon": "ChatDotSquare",
+    "children": [
+      { "id": 41, "name": "你的故事", "urlName": "YourStory", "children": null },
+      { "id": 42, "name": "故事列表", "urlName": "StoryList", "children": null }
+    ]
+  }
+]
+```
+
+编写工具类实现用户菜单到路由的转换
+
+```ts
+//   utils/mapManus.ts
+import systemView from '@/router/home/systemView'
+import systemManage from '@/router/home/systemManage'
+import goodCenter from '@/router/home/goodCenter'
+import sayTalks from '@/router/home/sayTalks'
+import { type RouteRecordRaw } from 'vue-router'
+
+export function mapMenusToRoutes(menus: any) {
+  const userRoutes: RouteRecordRaw[] = []
+
+  for (const menu of menus) {
+    const id = menu.id
+    if (id === 1) {
+      userRoutes.push(...systemView)
+    } else if (id === 2) {
+      userRoutes.push(...systemManage)
+    } else if (id === 3) {
+      userRoutes.push(...goodCenter)
+    } else if (id === 4) {
+      userRoutes.push(...sayTalks)
+    }
+  }
+  return userRoutes
+}
+```
+
+### 用户登录成功后设置动态路由
+
+在loginAccountAction中设置动态路由
+
+```ts
+const userRoutes = mapMenusToRoutes(userInfo.value.menus)
+//动态添加路由
+for (const route of userRoutes) {
+    router.addRoute('Home', route)
+}
+```
+
+### 用户登录状态下刷新页面设置动态路由
+
+在 store/login.ts 中编写 action ，将原加载本地缓存逻辑提取到该函数
+
+```ts
+//加载本地缓存并设置动态路由
+  function loadLocalstoreAction() {
+    //从本地存储中获取用户信息及状态
+    const localToken = localStorage.getItem('token')
+    const localUserInfo = localStorage.getItem('userInfo')
+    if (localToken && localUserInfo) {
+      token.value = localToken
+      userInfo.value = JSON.parse(localUserInfo)
+    } else {
+      return
+    }
+
+    const userRoutes = mapMenusToRoutes(userInfo.value.menus)
+    //动态添加路由
+    for (const route of userRoutes) {
+      router.addRoute('Home', route)
+    }
+  }
+```
+
+更新 store/index.ts 及 main.ts 逻辑，在重新加载应用时调用 loadLocalstoreAction 实现动态路由的持久化
+
+```ts
+// store/index.ts
+import { createPinia } from 'pinia'
+import { useLoginStore } from './login'
+import type { App } from 'vue'
+
+const pinia = createPinia()
+function registerStore(app: App) {
+  app.use(pinia)
+  const { loadLocalstoreAction } = useLoginStore()
+  loadLocalstoreAction()
+}
+export default registerStore
+```
+
+```ts
+// main.ts
+import { createApp } from 'vue'
+import App from './App.vue'
+import registerStore from './store'
+import router from '@/router'
+import 'normalize.css'
+import '@/assets/css/index.css'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+const app = createApp(App)
+//状态管理
+app.use(registerStore)
+//路由
+app.use(router)
+//ui组件库，图标库
+app.use(ElementPlus)
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+app.mount('#app')
+```
+
+### 面包屑实现
+
+面包屑组件
+
+```vue
+<el-breadcrumb separator-icon="ArrowRightBold">
+     <el-breadcrumb-item
+       v-for="item in breadcrumb"
+       :key="item.id"
+       :to="{ name: item.pathName }"
+     >
+       {{ item.label }}
+     </el-breadcrumb-item>
+</el-breadcrumb>
+```
+
+封装函数实现通过当前路径获取面包屑
+
+```ts
+//根据当前路径获取面包屑数据
+export function mapPathToBreadcrumb(pathName: any, userMenus: any) {
+  let breadcrumb
+  for (const menu of userMenus) {
+    for (const item of menu.children) {
+      if (item.urlName === pathName) {
+        breadcrumb = [
+          {
+            id: menu.id,
+            label: menu.name,
+            pathName: menu.children[0].urlName,
+          },
+          {
+            id: item.id,
+            label: item.name,
+            pathName: item.urlName,
+          },
+        ]
+      }
+    }
+  }
+  return breadcrumb
+}
+```
+
+调用函数获取数据，通过计算属性动态改变
+
+```ts
+import { useRoute } from 'vue-router'
+import { useLoginStore } from '@/store/login'
+
+const { userInfo } = storeToRefs(useLoginStore())
+const route = useRoute()
+//面包屑获取, 监听路由变化
+const breadcrumb = computed(() => {
+  return mapPathToBreadcrumb(route.name, userInfo.value.menus)
+})
+```
 
 
 
