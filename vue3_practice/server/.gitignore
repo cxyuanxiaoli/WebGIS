@@ -1,2 +1,4 @@
 node_modules/
 Config/
+logs/
+database/*copy*.json

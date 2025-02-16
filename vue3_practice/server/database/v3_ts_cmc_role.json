@@ -1,0 +1,1 @@
+{"name":"role","columns":[{"role":"admin","menus":[1,2,3,4]},{"role":"user","menus":[1,3,4]},{"role":"guest","menus":[1,4]}]}

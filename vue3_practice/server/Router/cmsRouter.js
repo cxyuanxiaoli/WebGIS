@@ -64,4 +64,50 @@ router.get("/user/:id", (req, res) => {
   res.json(ResFormat.success(user, "user info"));
 });
 
+//获取/查询用户列表接口
+router.post("/userlist", (req, res) => {
+  const { searchUser, pageSize, offset } = req.body;
+  const list = db.queryUserlist(searchUser);
+
+  const pageList = {
+    list: list.slice(offset * pageSize, (offset + 1) * pageSize),
+    // totalCount: list.length,
+    totalCount: list.length,
+  };
+  res.json(ResFormat.success(pageList, "user list"));
+});
+
+//获取角色列表接口
+router.get("/rolelist", (req, res) => {
+  const list = [];
+  db.tables[1].columns.forEach((item) => {
+    list.push(item.role);
+  });
+  res.json(ResFormat.success(list, "role list"));
+});
+
+//获取部门列表接口
+router.get("/departlist", (req, res) => {
+  const list = db.tables[3].columns.map((item) => {
+    return {
+      id: item.id,
+      name: item.name,
+    };
+  });
+  res.json(ResFormat.success(list, "departlist"));
+});
+
+//添加用户接口
+router.post("/user/add", (req, res) => {
+  db.addUser(req.body);
+  res.json(ResFormat.success(null, "add user success"));
+});
+
+//删除用户接口
+router.delete("/user/:id", (req, res) => {
+  const id = +req.params.id;
+  db.removeUser(id);
+  res.json(ResFormat.success(null, "delete user success"));
+});
+
 module.exports = router;

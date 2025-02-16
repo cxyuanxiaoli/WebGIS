@@ -53,7 +53,7 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router'
 import { computed, ref } from 'vue'
-import { useLoginStore } from '@/store/login'
+import { useLoginStore } from '@/store/login/login'
 import { storeToRefs } from 'pinia'
 import { mapPathToBreadcrumb } from '@/utils/mapMenus'
 

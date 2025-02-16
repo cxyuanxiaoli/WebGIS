@@ -1,5 +1,5 @@
 import { createPinia } from 'pinia'
-import { useLoginStore } from './login'
+import { useLoginStore } from './login/login'
 import type { App } from 'vue'
 
 const pinia = createPinia()

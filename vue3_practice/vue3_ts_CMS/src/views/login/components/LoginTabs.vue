@@ -60,7 +60,7 @@
 <script lang="ts" setup>
 import { type FormRules, type ElForm, ElMessage } from 'element-plus'
 import { reactive, ref } from 'vue'
-import { useLoginStore } from '@/store/login'
+import { useLoginStore } from '@/store/login/login'
 
 const loginStore = useLoginStore()
 

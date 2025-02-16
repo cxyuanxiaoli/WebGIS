@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useLoginStore } from '@/store/login'
+import { useLoginStore } from '@/store/login/login'
 import { RouterLink } from 'vue-router'
 
 const loginStore = useLoginStore()
