@@ -15,3 +15,8 @@ export async function deleteUserRequest(id: number) {
   const res = (await request.delete('/user/' + id)) as any
   return res
 }
+
+export async function putEditUserRequest(id: number, userInfo: IUser) {
+  const res = (await request.put('/user/' + id, userInfo)) as any
+  return res
+}

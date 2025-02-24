@@ -1,31 +1,36 @@
 <template>
   <div class="user-table">
-    <!-- 添加用户弹窗 -->
     <div class="title">
       <b>用户列表</b>
-      <el-button type="primary" size="default" @click="handleAddUser">新增用户</el-button>
+      <el-button type="primary" size="default" @click="handleDialog()">新增用户</el-button>
     </div>
+    <!-- 添加/编辑用户信息弹窗 -->
     <Modal
-      v-if="addUserDialogVisible"
-      :visible="addUserDialogVisible"
-      @close="updateAddDialogVisible"
+      v-if="dialogVisible"
+      :visible="dialogVisible"
+      :isAddModal="isAddDialog"
+      :form="formData"
+      @close="updateDialogVisible"
       @get-list="userManaStore.getUserList"
     ></Modal>
     <!-- 用户表格 -->
     <el-table :data="userlist" border stripe style="width: 100%">
+      <el-table-column type="index" label="序号" width="60" />
       <el-table-column prop="username" label="用户名" width="180" />
       <el-table-column prop="realname" label="姓名" width="130" />
       <el-table-column label="状态" width="75">
         <template #default="{ row }">
-          <el-tag v-show="row.status" type="primary" size="large">启用</el-tag>
-          <el-tag v-show="!row.status" type="danger" size="large">禁用</el-tag>
+          <el-tag v-if="row.status" type="primary" size="large">启用</el-tag>
+          <el-tag v-if="!row.status" type="danger" size="large">禁用</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="tel" label="手机号" />
+      <el-table-column prop="role" label="角色" />
+      <el-table-column prop="depart.name" label="部门" />
       <el-table-column prop="createTime" label="创建时间" />
       <el-table-column label="操作" width="150">
         <template #default="{ row }">
-          <el-button size="small">编辑</el-button>
+          <el-button size="small" @click="handleDialog(row)">编辑</el-button>
           <el-button size="small" type="danger" @click="handleDeleteUser(row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -46,29 +51,71 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import { useUserManaStore } from '@/store/home/systemManage/userMana'
 import { storeToRefs } from 'pinia'
 import Modal from './Modal.vue'
 import { deleteUserRequest } from '@/request/home/systemManage/userMana'
 import { ElMessage, ElMessageBox } from 'element-plus'
-//获取用户管理store
+import type { IUser } from '@/types'
+
+//获取store
 const userManaStore = useUserManaStore()
-//获取初始用户列表
-userManaStore.getUserList()
+
 //获取用户列表和分页信息
+userManaStore.getUserList()
 const { userlist, pageSize, totalCount, offset } = storeToRefs(userManaStore)
 
-// 新增用户弹窗状态
-const addUserDialogVisible = ref(false)
-//显示新增用户弹窗
-function handleAddUser() {
-  addUserDialogVisible.value = true
+// 新增用户弹窗状态及是否为添加用户弹窗
+const dialogVisible = ref(false)
+const isAddDialog = ref(true)
+
+//单行数据
+const formData = reactive<IUser>({
+  id: 0,
+  username: '',
+  realname: '',
+  tel: '',
+  role: '',
+  depart: {
+    id: 0,
+    name: '',
+  },
+  status: true,
+})
+
+//处理弹窗事件
+function handleDialog(user?: IUser) {
+  //编辑用户弹窗
+  if (user) {
+    console.log(user)
+    Object.assign(formData, toRaw(user))
+    isAddDialog.value = false
+  } else {
+    //新增用户弹窗，重置表单
+    Object.assign(formData, {
+      id: 0,
+      username: '',
+      realname: '',
+      tel: '',
+      role: '',
+      depart: {
+        id: 0,
+        name: '',
+      },
+      status: true,
+    })
+    isAddDialog.value = true
+  }
+  //显示弹窗
+  dialogVisible.value = true
 }
-//更新新增用户弹窗状态
-function updateAddDialogVisible(val: boolean) {
-  addUserDialogVisible.value = val
+
+//更新弹窗状态
+function updateDialogVisible(val: boolean) {
+  dialogVisible.value = val
 }
+
 //删除用户
 function handleDeleteUser(id: number) {
   ElMessageBox.confirm('确认删除用户？', '警告', {

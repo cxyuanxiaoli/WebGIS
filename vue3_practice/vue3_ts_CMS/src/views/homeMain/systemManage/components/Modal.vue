@@ -1,60 +1,77 @@
 <template>
-  <div class="modal">
-    <el-dialog v-model="dialogVisible" title="新增用户信息" width="35%" center append-to-body>
-      <div class="dialog-body">
-        <el-form :model="form" label-width="65px" size="large" :rules="rules" ref="formRef">
-          <el-form-item label="用户名" label-width="" prop="username">
-            <el-input v-model="form.username" autocomplete="off" />
-          </el-form-item>
-          <el-form-item label="姓名" label-width="" prop="realname">
-            <el-input v-model="form.realname" autocomplete="off" />
-          </el-form-item>
-          <el-form-item label="手机号" label-width="" prop="tel">
-            <el-input v-model="form.tel" autocomplete="off" />
-          </el-form-item>
-          <el-form-item label="角色" label-width="" prop="role">
-            <el-select v-model="form.role" placeholder="Select" style="width: 240px">
-              <el-option
-                v-for="(item, index) in roleList"
-                :key="index"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="部门" label-width="" prop="depart">
-            <el-select v-model="form.depart" style="width: 240px">
-              <el-option label="请选择" :value="0"></el-option>
-              <el-option
-                v-for="item in departList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
+  <el-dialog
+    v-model="dialogVisible"
+    :title="isAddModal ? '添加用户' : '编辑用户'"
+    width="35%"
+    center
+    append-to-body
+  >
+    <div class="dialog-body">
+      <el-form :model="form" label-width="65px" size="large" :rules="rules" ref="formRef">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="form.username" autocomplete="off" :disabled="!isAddModal" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="realname">
+          <el-input v-model="form.realname" autocomplete="off" />
+        </el-form-item>
+        <el-form-item v-if="!isAddModal" label="状态" prop="status">
+          <el-select v-model="form.status" style="width: 240px">
+            <el-option label="启用" :value="true"></el-option>
+            <el-option label="禁用" :value="false"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="手机号" prop="tel">
+          <el-input v-model="form.tel" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-select v-model="form.role" placeholder="Select" style="width: 240px">
+            <el-option v-for="(item, index) in roleList" :key="index" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门" prop="depart">
+          <el-select v-model="form.depart.id" style="width: 240px">
+            <el-option label="请选择" :value="0"></el-option>
+            <el-option
+              v-for="item in departList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button v-if="isAddModal" type="primary" @click="handleAddUser"> 添加 </el-button>
+        <el-button v-if="!isAddModal" type="primary" @click="handleAddUser"> 编辑 </el-button>
       </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleAddUser"> 添加 </el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { getRoleListRequest } from '@/request/home/systemManage/roleMana'
 import { getDepartListRequest } from '@/request/home/systemManage/departMana'
-import { postAddUserRequest } from '@/request/home/systemManage/userMana'
+import { postAddUserRequest, putEditUserRequest } from '@/request/home/systemManage/userMana'
 import { computed, ref, onMounted } from 'vue'
 import type { IDepart, IUser } from '@/types'
 import { ElForm, ElMessage } from 'element-plus'
 
-//由父组件控制弹窗显示
-const props = defineProps(['visible'])
+//服务器返回的列表数据
+const roleList = ref([])
+const departList = ref<IDepart[]>([])
+//请求数据
+onMounted(() => {
+  getRoleListRequest().then((res) => {
+    roleList.value = res.data
+  })
+  getDepartListRequest().then((res) => {
+    departList.value = res.data
+  })
+})
+
 const emits = defineEmits(['close', 'get-list'])
 const dialogVisible = computed({
   get() {
@@ -64,15 +81,33 @@ const dialogVisible = computed({
     emits('close', val)
   },
 })
-//表单数据
+
+/**
+ * @param visible 弹窗是否可见
+ * @param isAddModal 是否为新增用户弹窗
+ * @param form 表单数据
+ */
+const props = withDefaults(
+  defineProps<{ visible: boolean; isAddModal?: boolean; form?: IUser }>(),
+  {
+    form: () => ({
+      id: 0,
+      username: '',
+      realname: '',
+      tel: '',
+      role: '',
+      status: true,
+      depart: {
+        id: 0,
+        name: '',
+      },
+    }),
+  },
+)
+const form = ref(props.form)
+
+//表单实例
 const formRef = ref<InstanceType<typeof ElForm>>()
-const form = ref<IUser>({
-  username: '',
-  realname: '',
-  tel: '',
-  role: '',
-  depart: 0,
-})
 //表单验证规则
 const rules = {
   username: [
@@ -87,32 +122,31 @@ const rules = {
   role: [{ required: true, message: '请选择角色', trigger: 'change' }],
   depart: [{ required: true, message: '请选择部门', trigger: 'change' }],
 }
-//服务器返回的列表数据
-const roleList = ref([])
-const departList = ref<IDepart[]>([])
-//请求数据
-onMounted(() => {
-  getRoleListRequest().then((res) => {
-    roleList.value = res.data
-  })
-  getDepartListRequest().then((res) => {
-    departList.value = res.data
-  })
-})
 
-//添加用户按钮点击事件
+//确认按钮点击事件
 async function handleAddUser() {
+  //表单验证
   try {
     await formRef.value?.validate()
   } catch (err: any) {
     ElMessage.error('表单验证失败' + err.message)
     return
   }
-  postAddUserRequest(form.value).then((res) => {
-    ElMessage.success(res.message)
-    emits('get-list') //刷新列表数据
-    dialogVisible.value = false
-  })
+  //添加用户信息
+  if (props.isAddModal) {
+    postAddUserRequest(form.value).then((res) => {
+      ElMessage.success(res.message)
+      emits('get-list') //刷新列表数据
+      dialogVisible.value = false
+    })
+  } else {
+    //编辑用户信息
+    putEditUserRequest(form.value.id as number, form.value).then((res) => {
+      ElMessage.success(res.message)
+      emits('get-list') //刷新列表数据
+      dialogVisible.value = false
+    })
+  }
 }
 </script>
 

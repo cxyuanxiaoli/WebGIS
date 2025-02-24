@@ -56,12 +56,6 @@ const db = {
       JSON.stringify(departTable)
     );
   },
-  findById: (id) => {
-    return db.tables[0].columns.find((c) => c.id === id);
-  },
-  findByName: (username) => {
-    return db.tables[0].columns.find((c) => c.username === username);
-  },
   toUserFormat(userlist) {
     return userlist.map((c) => {
       return {
@@ -70,10 +64,17 @@ const db = {
         realname: c.realname,
         tel: c.tel,
         status: c.status,
+        role: c.role,
         createTime: c.createTime,
         depart: c.depart,
       };
     });
+  },
+  findUserById: (id) => {
+    return db.tables[0].columns.find((c) => c.id === id);
+  },
+  findUserByName: (username) => {
+    return db.tables[0].columns.find((c) => c.username === username);
   },
   queryUserlist(params) {
     //请求体为空，查询所有用户信息
@@ -111,15 +112,24 @@ const db = {
       role,
       status: true,
       createTime: this.formatDate(new Date()),
-      depart,
+      depart: depart.id,
     });
 
     this.init();
   },
-  removeUser(id) {
+  removeUserById(id) {
     let index = userTable.columns.findIndex((c) => c.id === id);
     if (index !== -1) {
       userTable.columns.splice(index, 1);
+      this.init();
+    }
+  },
+  editUserById(id, params) {
+    let index = userTable.columns.findIndex((c) => c.id === id);
+    if (index !== -1) {
+      const user = userTable.columns[index];
+      const { realname, tel, role, depart, status } = params;
+      Object.assign(user, { realname, tel, role, depart: depart.id, status });
       this.init();
     }
   },

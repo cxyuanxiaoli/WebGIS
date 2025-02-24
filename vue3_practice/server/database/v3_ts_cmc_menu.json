@@ -1,1 +1,93 @@
-{"name":"menus","columns":[{"id":1,"name":"系统总览","icon":"House","children":[{"id":11,"name":"核心技术","urlName":"CoreTechnology","children":null},{"id":12,"urlName":"GoodStatic","name":"商品统计","children":null}]},{"id":2,"name":"系统管理","icon":"Edit","children":[{"id":21,"name":"用户管理","urlName":"UserManage","children":null},{"id":22,"name":"部门管理","urlName":"DepartManage","children":null},{"id":23,"name":"菜单管理","urlName":"MenuManage","children":null},{"id":24,"name":"角色管理","urlName":"RoleManage","children":null}]},{"id":3,"name":"商品中心","icon":"ShoppingCart","children":[{"id":31,"name":"商品类别","urlName":"GoodsCategory","children":null},{"id":32,"name":"商品信息","urlName":"GoodsInfo","children":null}]},{"id":4,"name":"随便聊聊","icon":"ChatDotSquare","children":[{"id":41,"name":"你的故事","urlName":"YourStory","children":null},{"id":42,"name":"故事列表","urlName":"StoryList","children":null}]}]}
+{
+  "name": "menus",
+  "columns": [
+    {
+      "id": 1,
+      "name": "系统总览",
+      "icon": "House",
+      "children": [
+        {
+          "id": 11,
+          "name": "核心技术",
+          "urlName": "CoreTechnology",
+          "children": null
+        },
+        {
+          "id": 12,
+          "urlName": "GoodStatic",
+          "name": "商品统计",
+          "children": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "系统管理",
+      "icon": "Edit",
+      "children": [
+        {
+          "id": 21,
+          "name": "用户管理",
+          "urlName": "UserManage",
+          "children": null
+        },
+        {
+          "id": 22,
+          "name": "部门管理",
+          "urlName": "DepartManage",
+          "children": null
+        },
+        {
+          "id": 23,
+          "name": "菜单管理",
+          "urlName": "MenuManage",
+          "children": null
+        },
+        {
+          "id": 24,
+          "name": "角色管理",
+          "urlName": "RoleManage",
+          "children": null
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "商品中心",
+      "icon": "ShoppingCart",
+      "children": [
+        {
+          "id": 31,
+          "name": "商品类别",
+          "urlName": "GoodsCategory",
+          "children": null
+        },
+        {
+          "id": 32,
+          "name": "商品信息",
+          "urlName": "GoodsInfo",
+          "children": null
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "随便聊聊",
+      "icon": "ChatDotSquare",
+      "children": [
+        {
+          "id": 41,
+          "name": "你的故事",
+          "urlName": "YourStory",
+          "children": null
+        },
+        {
+          "id": 42,
+          "name": "故事列表",
+          "urlName": "StoryList",
+          "children": null
+        }
+      ]
+    }
+  ]
+}

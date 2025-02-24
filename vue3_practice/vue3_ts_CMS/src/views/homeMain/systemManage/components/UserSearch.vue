@@ -55,9 +55,10 @@
 import { useUserManaStore } from '@/store/home/systemManage/userMana'
 import { storeToRefs } from 'pinia'
 
-//获取用户管理store
+//获取store
 const userManaStore = useUserManaStore()
 const { searchUser } = storeToRefs(userManaStore)
+
 //查询用户列表
 function searchSubmit() {
   userManaStore.getUserList()
