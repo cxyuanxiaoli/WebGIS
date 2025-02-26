@@ -3,11 +3,76 @@ body {
   margin: 0;
   padding: 0;
 }
+body {
+  background-color: #e3e3e3;
+}
 
-#map {
-  width: 50vw;
-  height: 50vh;
+.map {
+  width: 78vw;
+  height: 98%;
   border: 1px solid black;
-  border-radius: 10px;
-  transform: translate(50%, 50%);
+  border-radius: 5px;
+  background-color: #ffffff;
+}
+.title {
+  height: 10vh;
+  background-color: #8ec1ff;
+}
+.content {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.tree {
+  height: 100%;
+  width: 20vw;
+  background-color: #fff;
+  padding: 2vh 2vw;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  color: #4d4d4d;
+}
+.tree ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.tree li {
+  position: relative;
+}
+.tree > ul > li {
+  margin-bottom: 10px;
+}
+.caret {
+  cursor: pointer;
+  user-select: none;
+}
+
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.caret-down::before {
+  transform: rotate(90deg);
+}
+
+.nested {
+  display: none;
+  font-size: 15px;
+  li {
+    cursor: pointer;
+  }
+  li:hover {
+    color: #ff5959;
+  }
+}
+
+.active {
+  display: block;
 }

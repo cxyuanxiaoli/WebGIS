@@ -4,13 +4,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>ol quickstart</title>
   <link rel="stylesheet" href="./src/css/index.css">
 </head>
 
 <body>
-  <div id="map"></div>
-  <script src="./src/main.ts" type="module"></script>
+  <div class="title"></div>
+  <div class="content">
+    <div class="tree">
+      <ul>
+        <li>
+          <span class="caret">加载地图</span>
+          <ul class="nested">
+            <li>加载地图</li>
+            <li>子节点2</li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <span class="caret">地图控件</span>
+          <ul class="nested" id="map-controls">
+            <li>导航控件</li>
+            <li>基本操作控件</li>
+            <li>图层控件</li>
+            <li>鼠标位置控件</li>
+            <li>比例尺控件</li>
+            <li>鹰眼控件</li>
+            <li>全屏显示控件</li>
+            <li>图层探查控件</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="map" id="map">
+      <div class="custom-btn custom-hide">
+        基本操作按钮
+        <input type="button" value="缩小" id="sca-min">
+        <input type="button" value="放大" id="sca-max">
+        <input type="button" value="平移" id="pan">
+        <input type="button" value="复位" id="reset">
+      </div>
+      <div class="layer-control custom-hide">
+        图层列表
+        <ul>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var carets = document.getElementsByClassName("caret");
+      for (var i = 0; i < carets.length; i++) {
+        carets[i].addEventListener("click", function () {
+          this.parentElement.querySelector(".nested").classList.toggle("active");
+          this.classList.toggle("caret-down");
+        });
+      }
+    });
+  </script>
+  <script src="./src/index.ts" type="module"></script>
 
 </body>
 

@@ -1,0 +1,105 @@
+import { map } from "../1-loadMap/loadMap";
+
+import {
+  ZoomSlider,
+  ZoomToExtent,
+  MousePosition,
+  ScaleLine,
+  OverviewMap,
+  FullScreen,
+} from "ol/control";
+import customBaseControls from "./customBaseControls";
+import customLayersListControl from "./customLayersListControl";
+import { createStringXY } from "ol/coordinate";
+import addCustomLayerExplore from "./customLayerExplore";
+import MyLayers from "../1-loadMap/loadLayers";
+
+export default function addControls() {
+  const addControlsLis = document.querySelectorAll("#map-controls li");
+  //添加导航控件
+  const addZoomSlider = (event: Event) => {
+    map.addControl(new ZoomSlider());
+    map.addControl(
+      new ZoomToExtent({
+        extent: [115, 35, 116, 36],
+      })
+    );
+    document
+      .querySelector("#map .ol-zoom-out")
+      ?.classList.add("ol-zoom-out-custom");
+
+    event.target?.removeEventListener("click", addZoomSlider);
+  };
+  //添加自定义基础控件
+  const addCustomBaseBtn = (event: Event) => {
+    document.querySelector(".custom-btn")?.classList.remove("custom-hide");
+    customBaseControls();
+    event.target?.removeEventListener("click", addCustomBaseBtn);
+  };
+  //添加自定义图层列表控件
+  const addLayerControl = (event: Event) => {
+    document.querySelector(".layer-control")?.classList.remove("custom-hide");
+    customLayersListControl();
+    event.target?.removeEventListener("click", addLayerControl);
+  };
+  //添加鼠标位置控件
+  const addMousePosition = (event: Event) => {
+    map.addControl(
+      new MousePosition({
+        coordinateFormat: createStringXY(6),
+        projection: "EPSG:4326",
+        className: "custom-mouse-position",
+      })
+    );
+    event.target?.removeEventListener("click", addMousePosition);
+  };
+  //添加比例尺控件
+  const addScaleLine = (event: Event) => {
+    map.addControl(
+      new ScaleLine({
+        //degrees 度, imperial 英制单位, us 美制单位, metric 公制单位, or nautical 海里
+        units: "metric",
+      })
+    );
+    event.target?.removeEventListener("click", addScaleLine);
+  };
+  //添加鹰眼控件
+  const addOverviewMap = (event: Event) => {
+    map.addControl(
+      new OverviewMap({
+        layers: [MyLayers.chinaGeojson],
+        collapsed: false,
+        // collapsible: false,
+        collapseLabel: "\u00BB",
+        label: "\u00AB",
+      })
+    );
+    event.target?.removeEventListener("click", addOverviewMap);
+  };
+  //添加全屏显示控件
+  const addFullScreen = (event: Event) => {
+    map.addControl(new FullScreen());
+    event.target?.removeEventListener("click", addFullScreen);
+  };
+  //添加图层探测
+  const addLayerExplorer = (event: Event) => {
+    addCustomLayerExplore();
+    event.target?.removeEventListener("click", addLayerExplorer);
+  };
+
+  const methods = [
+    addZoomSlider,
+    addCustomBaseBtn,
+    addLayerControl,
+    addMousePosition,
+    addScaleLine,
+    addOverviewMap,
+    addFullScreen,
+    addLayerExplorer,
+  ];
+
+  //绑定事件
+  for (let i = 0; i < methods.length; i++) {
+    addControlsLis[i].addEventListener("click", methods[i]);
+  }
+}
