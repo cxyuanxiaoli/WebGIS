@@ -1,4 +1,5 @@
 #map {
+  /* 缩放按钮控件 */
   .ol-zoom {
     background-color: transparent;
     .ol-zoom-in {
@@ -11,17 +12,18 @@
       margin-top: 230px;
     }
   }
-
+  /* 缩放滑块控件 */
   .ol-zoomslider {
     /* background-color: transparent; */
     top: 60px;
   }
+  /* 缩放到指定区域控件 */
   .ol-zoom-extent {
     top: 33px;
   }
+  /* 鼠标位置控件 */
   .ol-mouse-position {
-    top: auto;
-    bottom: 5%;
+    /* bottom: 1%; */
   }
   .custom-mouse-position {
     color: #ff7410;
@@ -31,34 +33,57 @@
     font-size: 16px;
     font-family: "微软雅黑";
   }
+  /* 比例尺控件 */
   .ol-scale-line {
     left: 180px;
   }
+  /* 全屏按钮控件 */
   .ol-full-screen {
     top: 30px;
   }
+
+  /* 自定义基础控件 */
   .custom-btn {
     position: absolute;
-    left: 30%;
+    left: 10%;
+    top: 0%;
     background-color: #ffffff;
     display: flex;
     z-index: 10;
   }
+  /* 用于隐藏控件 */
   .custom-hide {
     display: none;
   }
-
+  /* 自定义图层列表控件 */
   .layer-control {
-    width: 10%;
+    width: 15%;
     color: #ffffff;
     background-color: #365bff;
     position: absolute;
     z-index: 10;
-    bottom: 30%;
-    right: 2%;
+    bottom: 10%;
+    right: 1%;
     ul {
       list-style: none;
       padding: 0 10px;
     }
+  }
+  /* 自定义图层探索控件 */
+  .layer-explore {
+    position: absolute;
+    top: 0%;
+    right: 5%;
+    z-index: 10;
+    background-color: #365bff;
+    color: #ffffff;
+  }
+  /* 自定义动画按钮控件 */
+  .animate-control {
+    position: absolute;
+    top: 0%;
+    left: 38%;
+    z-index: 10;
+    background-color: #ffffff;
   }
 }

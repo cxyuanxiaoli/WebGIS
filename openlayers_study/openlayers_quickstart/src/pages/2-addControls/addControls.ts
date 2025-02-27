@@ -1,5 +1,4 @@
 import { map } from "../1-loadMap/loadMap";
-
 import {
   ZoomSlider,
   ZoomToExtent,
@@ -12,6 +11,7 @@ import customBaseControls from "./customBaseControls";
 import customLayersListControl from "./customLayersListControl";
 import { createStringXY } from "ol/coordinate";
 import addCustomLayerExplore from "./customLayerExplore";
+import addCustomAnimationControl from "./customAnimateControl";
 import MyLayers from "../1-loadMap/loadLayers";
 
 export default function addControls() {
@@ -21,13 +21,12 @@ export default function addControls() {
     map.addControl(new ZoomSlider());
     map.addControl(
       new ZoomToExtent({
-        extent: [115, 35, 116, 36],
+        extent: [8430000, 2550000, 15450000, 6500000],
       })
     );
     document
       .querySelector("#map .ol-zoom-out")
       ?.classList.add("ol-zoom-out-custom");
-
     event.target?.removeEventListener("click", addZoomSlider);
   };
   //添加自定义基础控件
@@ -86,6 +85,12 @@ export default function addControls() {
     addCustomLayerExplore();
     event.target?.removeEventListener("click", addLayerExplorer);
   };
+  //添加动画控件
+  const addAnimationControl = (event: Event) => {
+    addCustomAnimationControl();
+    document.querySelector(".animate-control")?.classList.remove("custom-hide");
+    event.target?.removeEventListener("click", addAnimationControl);
+  };
 
   const methods = [
     addZoomSlider,
@@ -96,6 +101,7 @@ export default function addControls() {
     addOverviewMap,
     addFullScreen,
     addLayerExplorer,
+    addAnimationControl,
   ];
 
   //绑定事件
