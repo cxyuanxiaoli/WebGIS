@@ -18,6 +18,7 @@ body {
 .title {
   height: 10vh;
   background-color: #8ec1ff;
+  position: relative;
 }
 .content {
   height: 90vh;

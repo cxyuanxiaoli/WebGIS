@@ -1,9 +1,10 @@
-import BaseLayer from "ol/layer/Base";
 import { map } from "../1-loadMap/loadMap";
 
 export default function customLayersListControl() {
   const layers = map.getLayers();
-  const layersListElem = document.querySelector(".layer-control ul");
+  const layersListElem = document.querySelector(
+    ".layer-control ul"
+  ) as HTMLElement;
   for (let i = 0; i < layers.getLength(); i++) {
     //获取各图层的名称和可见性
     const layer = layers.item(i);
@@ -28,4 +29,13 @@ export default function customLayersListControl() {
       layer.setVisible(checkbox.checked);
     });
   }
+  // map.once("change:layergroup", () => {
+  //   //去除所有的li元素
+  //   while (layersListElem.firstChild) {
+  //     layersListElem.removeChild(layersListElem.firstChild);
+  //   }
+  //   console.log("layergroup changed");
+
+  //   customLayersListControl();
+  // });
 }

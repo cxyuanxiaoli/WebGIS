@@ -1,6 +1,5 @@
 import { fromLonLat } from "ol/proj";
 import { map } from "../1-loadMap/loadMap";
-import { Coordinate } from "ol/coordinate";
 import { easeIn, easeOut } from "ol/easing";
 
 export default function addCustomAnimationControl() {

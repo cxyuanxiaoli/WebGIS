@@ -30,6 +30,7 @@ const chinaGeojson = new VectorLayer({
   }),
 });
 chinaGeojson.set("name", "中国地图-geojson");
+chinaGeojson.setVisible(false);
 
 //KML数据
 const huadongKml = new VectorLayer({
@@ -39,5 +40,6 @@ const huadongKml = new VectorLayer({
   }),
 });
 huadongKml.set("name", "华东地区-kml");
+huadongKml.setVisible(false);
 
 export default { TdtImage, GaodeMap, chinaGeojson, huadongKml };

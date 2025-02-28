@@ -9,7 +9,39 @@
 </head>
 
 <body>
-  <div class="title"></div>
+  <div class="title">
+    <div class="draw-shape">
+      绘制图形
+      <select id="shape-type" disabled>
+        <option value="None">无</option>
+        <option value="Point">点</option>
+        <option value="LineString">线</option>
+        <option value="Polygon">面</option>
+        <option value="Circle">圆</option>
+        <option value="Square">正方形</option>
+        <option value="Box">长方形</option>
+      </select>
+    </div>
+    <div class="custom-style custom-hide">
+      更改要素样式<br>
+      点
+      大小
+      <input type="range" id="point-size" value="7" max="30" min="1">
+      颜色
+      <input type="color" id="point-color" value="#ff0000">
+      线
+      颜色
+      <input type="color" id="stroke-color" value="#ff0000">
+      宽度
+      <input type="range" id="stroke-width" value="2" max="10" min="1">
+      面
+      填充颜色
+      <input type="color" id="fill-color" value="#47494e">
+      透明度
+      <input type="range" id="fill-opacity" value="4" max="9" min="1">
+      <button id="apply-style">应用</button>
+    </div>
+  </div>
   <div class="content">
     <div class="tree">
       <ul>
@@ -33,6 +65,14 @@
             <li>全屏显示控件</li>
             <li>图层探查控件</li>
             <li>动画效果控件</li>
+          </ul>
+        </li>
+        <li>
+          <span class="caret">图形绘制</span>
+          <ul class="nested" id="draw-shapes">
+            <li>图形绘制开关</li>
+            <li>调整要素样式</li>
+
           </ul>
         </li>
       </ul>
@@ -65,6 +105,7 @@
         <button class="animate-btn" id="rotate">围绕旋转</button>
         <button class="animate-btn" id="fiy">飞行定位</button>
       </div>
+
     </div>
   </div>
   <script>

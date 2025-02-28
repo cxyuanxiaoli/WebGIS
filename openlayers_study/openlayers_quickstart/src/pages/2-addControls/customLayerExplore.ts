@@ -1,5 +1,9 @@
+import RenderEvent from "ol/render/Event";
 import { map } from "../1-loadMap/loadMap";
 import TileLayer from "ol/layer/Tile";
+import { FrameState } from "ol/Map";
+import { Pixel } from "ol/pixel";
+import Layer from "ol/layer/Layer";
 export default function addCustomLayerExplore() {
   //关闭图层探索函数
   let closeLayerExplore: any = null;
@@ -27,10 +31,10 @@ export default function addCustomLayerExplore() {
 //图层探索功能函数，返回关闭函数
 function layerExplore() {
   const mapContainer = map.getTargetElement();
-  const topLayer = map.getLayers().item(1) as TileLayer;
+  const topLayer = map.getLayers().item(1) as Layer;
 
   let radius = 75;
-  const adjustRadius = (event: any) => {
+  const adjustRadius = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp") {
       radius = Math.min(radius + 5, 150);
       map.render(); //重新渲染
@@ -44,23 +48,24 @@ function layerExplore() {
   document.addEventListener("keydown", adjustRadius);
 
   //获取鼠标位置
-  let mousePosition: any = null;
-  const getMousePosition = (event: any) => {
-    mousePosition = map.getEventPixel(event as UIEvent);
+  let mousePosition: Pixel;
+  const getMousePosition = (event: MouseEvent) => {
+    //获取浏览器事件相对于视口的像素位置
+    mousePosition = map.getEventPixel(event);
     map.render();
   };
-  const removeMousePosition = (event: any) => {
-    mousePosition = null;
+  const removeMousePosition = (event: MouseEvent) => {
+    mousePosition = [];
     map.render();
   };
   mapContainer.addEventListener("mousemove", getMousePosition);
   mapContainer.addEventListener("mouseout", removeMousePosition);
 
   //绘制圆形裁剪上层图层
-  const topLayerPreRender = (event: any) => {
+  const topLayerPreRender = (event: RenderEvent) => {
     // 获取绘图上下文和像素比例
-    let ctx = event.context;
-    let pixelRatio = event.frameState.pixelRatio;
+    let ctx = event.context as CanvasRenderingContext2D;
+    let pixelRatio = (event.frameState as FrameState).pixelRatio;
     // 保存当前绘图状态
     ctx.save();
     // 开始绘制路径
@@ -85,9 +90,9 @@ function layerExplore() {
   };
 
   // 图层渲染后恢复绘图状态
-  const topLayerPostRender = (event: any) => {
+  const topLayerPostRender = (event: RenderEvent) => {
     // 获取绘图上下文
-    let ctx = event.context;
+    let ctx = event.context as CanvasRenderingContext2D;
     // 恢复之前保存的绘图状态
     ctx.restore();
   };

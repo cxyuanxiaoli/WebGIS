@@ -127,6 +127,24 @@ map.addControl(new FullScreen());
 
 ### 自定义控件-关键代码
 
+* `view.getZoom()`
+* `view.setZoom(zoom)`
+* `view.getCenter()`
+* `view.setCenter(center)`
+* `view.getRotation()`
+* `view.setRotation(rotate)`
+* `view.animate(animations)`
+* `layer.get(key)`
+* `layer.set(key,value)`
+* `layer.getVisible()`
+* `layer.setVisible(visible)`
+* `map.getTargetElement()`             获取map的target元素
+* `map.getLayers()`                        获取map的所有图层
+* `map.render() `                         重新渲染map
+* `map.getEventPixel(event)`                 获取浏览器事件相对于视口的像素位置
+* `layer.on("prerender", (event:RenderEvent)=>{})`              图层的预渲染事件
+* `layer.on("postrender", (event:RenderEvent)=>{}) `            图层的渲染完成事件
+
 #### 基础控件
 
 ```ts
@@ -186,7 +204,7 @@ const mapContainer = map.getTargetElement();
 const topLayer = map.getLayers().item(1) as TileLayer;
 
 let radius = 75;
-const adjustRadius = (event: any) => {
+const adjustRadius = (event: KeyboardEvent) => {
   if (event.key === "ArrowUp") {
     radius = Math.min(radius + 5, 150);
     map.render(); //重新渲染
@@ -200,28 +218,26 @@ const adjustRadius = (event: any) => {
 document.addEventListener("keydown", adjustRadius);
 
 //获取鼠标位置
-let mousePosition: any = null;
-const getMousePosition = (event: any) => {
-  mousePosition = map.getEventPixel(event as UIEvent);
+let mousePosition: Pixel;
+const getMousePosition = (event: MouseEvent) => {
+  //获取浏览器事件相对于视口的像素位置
+  mousePosition = map.getEventPixel(event);
   map.render();
 };
-const removeMousePosition = (event: any) => {
-  mousePosition = null;
+const removeMousePosition = (event: MouseEvent) => {
+  mousePosition = [];
   map.render();
 };
 mapContainer.addEventListener("mousemove", getMousePosition);
 mapContainer.addEventListener("mouseout", removeMousePosition);
 
 //绘制圆形裁剪上层图层
-const topLayerPreRender = (event: any) => {
+const topLayerPreRender = (event: RenderEvent) => {
   // 获取绘图上下文和像素比例
-  let ctx = event.context;
-  let pixelRatio = event.frameState.pixelRatio;
-  // 保存当前绘图状态
+  let ctx = event.context as CanvasRenderingContext2D;
+  let pixelRatio = (event.frameState as FrameState).pixelRatio;
   ctx.save();
-  // 开始绘制路径
   ctx.beginPath();
-  // 如果鼠标位置存在，绘制一个圆形
   if (mousePosition) {
     ctx.arc(
       mousePosition[0] * pixelRatio,
@@ -233,7 +249,6 @@ const topLayerPreRender = (event: any) => {
     // 设置圆形的线条宽度和颜色
     ctx.lineWidth = 5 * pixelRatio;
     ctx.strokeStyle = "red";
-    // 绘制圆形
     ctx.stroke();
   }
   // 剪切绘图区域，限制后续绘制操作在圆形区域内
@@ -241,9 +256,8 @@ const topLayerPreRender = (event: any) => {
 };
 
 // 图层渲染后恢复绘图状态
-const topLayerPostRender = (event: any) => {
-  // 获取绘图上下文
-  let ctx = event.context;
+const topLayerPostRender = (event: RenderEvent) => {
+  let ctx = event.context as CanvasRenderingContext2D;
   // 恢复之前保存的绘图状态
   ctx.restore();
 };
@@ -365,6 +379,128 @@ view.animate(
   }
 );
 ```
+
+## 图形绘制
+
+### 绘制几何图形
+
+* `map.addInteraction(interaction);`
+* `map.removeInteraction(interaction);`
+* `layer.setSource(source)`
+* `layer.getSource()`
+
+1. 新建矢量图层设置数据源及要素样式
+
+   ```ts
+   //创建矢量图层
+   const vector = new VectorLayer({
+     source: new VectorSource() as any,
+     //设置样式
+     style: new Style({
+       //填充颜色，边框颜色，宽度，点的样式
+       fill: new Fill({
+         color: "rgba(117, 117, 117, 0.4)",
+       }),
+       stroke: new Stroke({
+         color: "red",
+         width: 2,
+       }),
+       image: new Circle({
+         radius: 7,
+         fill: new Fill({
+           color: "red",
+         }),
+       }),
+     }),
+   });
+   vector.set("name", "drawn-shape");
+   map.addLayer(vector);
+   ```
+
+2. 创建绘制交互对象
+
+   * The geometry type. One of `'Point'`, `'LineString'`, `'LinearRing'`, `'Polygon'`, `'MultiPoint'`, `'MultiLineString'`, `'MultiPolygon'`, `'GeometryCollection'`, or `'Circle'`.
+
+   ```ts
+   //创建绘图交互
+   draw = new Draw({
+     source: vector.getSource(),   //绘制的要素的目标源
+     type: 'Point',     //绘制的要素类型
+   });
+   map.addInteraction(draw);
+   ```
+
+3. 去除绘图交互对象
+
+   ```ts
+   map.removeInteraction(draw);
+   ```
+
+4. 通过下拉框实现各种几何图形的绘制
+
+   ```html
+   <select id="shape-type" disabled>
+     <option value="None">无</option>
+     <option value="Point">点</option>
+     <option value="LineString">线</option>
+     <option value="Polygon">面</option>
+     <option value="Circle">圆</option>
+     <option value="Square">正方形</option>
+     <option value="Box">长方形</option>
+   </select>
+   ```
+
+   ```ts
+   //获取下拉列表元素
+   const select = document.querySelector("#shape-type") as HTMLSelectElement;
+   let draw: Draw;
+   let source: any;
+   
+   select.onchange = () => {
+     map.removeInteraction(draw);  //移除交互
+     addInteraction();
+   };
+   addInteraction();
+   
+   function addInteraction() {
+     //获取下拉列表元素值
+     let type = select.value as any;
+     let geometryFunction = undefined;
+     if (type === "None") {
+       //清除绘制内容
+       source = null;
+       vector.setSource(source);
+       return;
+     } else {
+       if (!source) {
+         //source为空时创建矢量源
+         source = new VectorSource();
+         vector.setSource(source);
+       }
+       //处理未定义图形
+       if (type === "Square") {
+         type = "Circle";
+         //创建一个用于 type: 'Circle' 的 GeometryFunction，
+         //该函数将生成一个具有用户指定边数和起始角的正多边形，而不是圆形。
+         geometryFunction = createRegularPolygon(4);
+       } else if (type === "Box") {
+         type = "Circle";
+         //创建一个 GeometryFunction，用于生成一个与坐标系轴对齐的矩形多边形
+         //将此函数与绘制交互和 type: 'Circle' 一起使用，以返回矩形而不是圆形
+         geometryFunction = createBox();
+       }
+     }
+     //创建绘制交互
+     draw = new Draw({
+       source: source, //绘制的要素的目标源
+       type: type, //绘制的要素类型
+       geometryFunction: geometryFunction, //当几何图形的坐标更新时调用的函数
+     });
+     map.addInteraction(draw);
+   }
+   ```
+
+
 
 
 
