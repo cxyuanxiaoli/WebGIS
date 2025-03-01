@@ -500,6 +500,89 @@ view.animate(
    }
    ```
 
+### 自定义要素样式
+
+* layer.setStyle(style)          修改矢量图层要素样式
+
+* 点的样式
+
+  ```ts
+  style: new Style({
+    image: new Circle({
+      radius: 5,     //点的大小
+      fill: new Fill({
+        color: "red",    //点的颜色
+      }),
+    }),
+  }),
+  ```
+
+* 线的样式
+
+  ```ts
+  style: new Style({
+    stroke: new Stroke({
+      color: "blue",     //线的颜色
+      width: 2,        //线的宽度
+    }),
+  }),
+  ```
+
+* 面的样式
+
+  ```ts
+  style: new Style({
+    stroke: new Stroke({
+      color: "#00ff00",     //边界颜色
+      width: 2,             //边界宽度
+    }),
+    fill: new Fill({ 
+      color: "rgba(255,0,0, 0.3)",    //填充颜色
+    }),
+  }),
+  ```
+
+* 文本样式
+
+  ```ts
+  // 自定义文字样式
+  const textStyle = new Text({
+    textAlign: "center",
+    textBaseline: "middle",
+    rotation: 0,
+    font: "normal 14px Arial",
+    offsetX: 0,
+    offsetY: -10,
+    fill: new Fill({
+      color: "black",
+    }),
+    text: "shape",
+    stroke: new Stroke({
+      color: "white",
+      width: 3,
+    }),
+    scale: 1,
+  });
+  ```
+
+### 选择和修改要素
+
+* 为map添加选择、修改交互
+
+  ```ts
+  const select = new Select();
+  const modify = new Modify({
+    features: select.getFeatures(),
+  });
+  map.addInteraction(select);
+  map.addInteraction(modify);
+  
+  select.setActive(true);
+  modify.setActive(true);
+  ```
+
+  
+
 
 
 

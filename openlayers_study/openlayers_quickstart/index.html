@@ -10,6 +10,9 @@
 
 <body>
   <div class="title">
+
+    <h1>OpenLayers Quickstart</h1>
+    <a id="export-png" download="map.png">导出地图</a>
     <div class="draw-shape">
       绘制图形
       <select id="shape-type" disabled>
@@ -23,22 +26,78 @@
       </select>
     </div>
     <div class="custom-style custom-hide">
-      更改要素样式<br>
-      点
+      <i>更改要素样式</i><br>
+      <b>点</b>
       大小
-      <input type="range" id="point-size" value="7" max="30" min="1">
+      <input type="range" id="point-size" value="5" max="15" min="2">
       颜色
       <input type="color" id="point-color" value="#ff0000">
-      线
+      <b>线</b>
+
       颜色
-      <input type="color" id="stroke-color" value="#ff0000">
+      <input type="color" id="stroke-color" value="#0000ff">
       宽度
       <input type="range" id="stroke-width" value="2" max="10" min="1">
-      面
+      <b>面</b>
+      边界颜色
+      <input type="color" id="fill-stroke-color" value="#00ff00">
+      边界宽度
+      <input type="range" id="fill-stroke-width" value="2" max="10" min="1">
       填充颜色
-      <input type="color" id="fill-color" value="#47494e">
-      透明度
-      <input type="range" id="fill-opacity" value="4" max="9" min="1">
+      <input type="color" id="fill-color" value="#ff0000">
+      不透明度
+      <input type="range" id="fill-opacity" value="3" max="9" min="1">
+      <br>
+      <b>文字样式</b>
+      位置
+      <select id="text-position">
+        <option value="center" selected>center</option>
+        <option value="end">end</option>
+        <option value="left">left</option>
+        <option value="right">right</option>
+        <option value="start">start</option>
+      </select>
+      基线
+      <select id="text-baseline">
+        <option value="alphabetic">alphabetic</option>
+        <option value="bottom">bottom</option>
+        <option value="hanging">hanging</option>
+        <option value="ideographic">ideographic</option>
+        <option value="middle" selected>middle</option>
+        <option value="top">top</option>
+      </select>
+      旋转角度
+      <select id="text-rotate">
+        <option value="0" selected>0度</option>
+        <option value="0.7853981633974483">45度</option>
+        <option value="1.5707963267948966">90度</option>
+      </select>
+      字体
+      <select id="text-fontstyle">
+        <option value="Arial" selected>Arial</option>
+        <option value="Calibri">Calibri</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Georgia">Georgia</option>
+      </select>
+      字体粗细
+      <select id="text-fontweight">
+        <option value="bold">Bold</option>
+        <option value="normal" selected>Normal</option>
+      </select>
+      字体大小
+      <input type="range" id="text-fontsize" value="14" max="40" min="5">
+      x偏移量
+      <input type="number" id="text-offsetx" value="0">
+      y偏移量
+      <input type="number" id="text-offsety" value="-10">
+      字体颜色
+      <input type="color" id="text-color" value="#000000">
+      文字外框颜色
+      <input type="color" id="text-stroke-color" value="#ffffff">
+      文字外框宽度
+      <input type="range" id="text-stroke-width" value="3" max="6" min="1">
+      文字内容
+      <input type="text" id="text-content" value="shape">
       <button id="apply-style">应用</button>
     </div>
   </div>

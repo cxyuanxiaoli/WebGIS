@@ -5,12 +5,7 @@ import MyLayers from "./loadLayers";
 
 const map = new Map({
   target: "map",
-  layers: [
-    MyLayers.TdtImage,
-    MyLayers.GaodeMap,
-    MyLayers.chinaGeojson,
-    MyLayers.huadongKml,
-  ],
+  layers: [MyLayers.TdtImage, MyLayers.GaodeMap],
   view: new View({
     center: fromLonLat([116, 36]),
     zoom: 5,

@@ -1,6 +1,5 @@
 import RenderEvent from "ol/render/Event";
 import { map } from "../1-loadMap/loadMap";
-import TileLayer from "ol/layer/Tile";
 import { FrameState } from "ol/Map";
 import { Pixel } from "ol/pixel";
 import Layer from "ol/layer/Layer";

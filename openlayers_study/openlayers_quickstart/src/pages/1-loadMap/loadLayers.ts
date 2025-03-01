@@ -1,9 +1,5 @@
 import TileLayer from "ol/layer/Tile";
-import VectorLayer from "ol/layer/Vector";
-import { Vector } from "ol/source";
 import XYZ from "ol/source/XYZ";
-import GeoJSON from "ol/format/GeoJSON";
-import KML from "ol/format/KML";
 
 // 天地图影像图层
 const TdtImage = new TileLayer({
@@ -21,25 +17,6 @@ const GaodeMap = new TileLayer({
   }),
 });
 GaodeMap.set("name", "高德地图图层");
+GaodeMap.setOpacity(0.8);
 
-//GeoJSON数据
-const chinaGeojson = new VectorLayer({
-  source: new Vector({
-    url: "https://geojson.cn/api/china/100000.json",
-    format: new GeoJSON(),
-  }),
-});
-chinaGeojson.set("name", "中国地图-geojson");
-chinaGeojson.setVisible(false);
-
-//KML数据
-const huadongKml = new VectorLayer({
-  source: new Vector({
-    url: "../../../static/data/huadong.kml",
-    format: new KML(),
-  }),
-});
-huadongKml.set("name", "华东地区-kml");
-huadongKml.setVisible(false);
-
-export default { TdtImage, GaodeMap, chinaGeojson, huadongKml };
+export default { TdtImage, GaodeMap };

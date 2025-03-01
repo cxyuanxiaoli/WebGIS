@@ -1,27 +1,33 @@
-import Circle from "ol/style/Circle";
-import VectorLayer from "ol/layer/Vector";
-import Fill from "ol/style/Fill";
-import Stroke from "ol/style/Stroke";
-import Style from "ol/style/Style";
-import Draw, { createRegularPolygon, createBox } from "ol/interaction/Draw";
 import { map } from "../1-loadMap/loadMap";
+import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
+import { Style, Stroke, Fill, Circle } from "ol/style";
+import Draw, { createRegularPolygon, createBox } from "ol/interaction/Draw";
+import customStyle from "./customStyle";
+import modifyShape from "./modifyShape";
 
 export default function drawShape() {
   //获取下拉列表元素
   const select = document.querySelector("#shape-type") as HTMLSelectElement;
-
   document
     .querySelectorAll("#draw-shapes li")[0]
     .addEventListener("click", () => {
       select.disabled = !select.disabled;
     });
-
   document
     .querySelectorAll("#draw-shapes li")[1]
     .addEventListener("click", () => {
       document.querySelector(".custom-style")?.classList.toggle("custom-hide");
     });
+
+  drawCustomShape();
+  customStyle();
+  modifyShape();
+}
+
+//图形绘制函数
+function drawCustomShape() {
+  const select = document.querySelector("#shape-type") as HTMLSelectElement;
 
   let draw: Draw;
   let source: any;
@@ -92,45 +98,4 @@ export default function drawShape() {
     });
     map.addInteraction(draw);
   }
-
-  //获取样式设置并应用样式
-  document.querySelector("#apply-style")?.addEventListener("click", () => {
-    const fillColor = (
-      document.querySelector("#fill-color") as HTMLInputElement
-    ).value;
-    const fillOpacity =
-      +(document.querySelector("#fill-opacity") as HTMLInputElement).value / 10;
-    const strokeColor = (
-      document.querySelector("#stroke-color") as HTMLInputElement
-    ).value;
-    const strokeWidth = +(
-      document.querySelector("#stroke-width") as HTMLInputElement
-    ).value;
-    const pointSize = +(
-      document.querySelector("#point-size") as HTMLInputElement
-    ).value;
-    const pointColor = (
-      document.querySelector("#point-color") as HTMLInputElement
-    ).value;
-
-    const style = new Style({
-      fill: new Fill({
-        color: `rgba(${parseInt(fillColor.slice(1, 3), 16)}, 
-                   ${parseInt(fillColor.slice(3, 5), 16)}, 
-                   ${parseInt(fillColor.slice(5, 7), 16)}, 
-                   ${fillOpacity})`,
-      }),
-      stroke: new Stroke({
-        color: strokeColor,
-        width: strokeWidth,
-      }),
-      image: new Circle({
-        radius: pointSize,
-        fill: new Fill({
-          color: pointColor,
-        }),
-      }),
-    });
-    vector.setStyle(style);
-  });
 }

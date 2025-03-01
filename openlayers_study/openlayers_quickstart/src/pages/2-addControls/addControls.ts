@@ -12,7 +12,9 @@ import customLayersListControl from "./customLayersListControl";
 import { createStringXY } from "ol/coordinate";
 import addCustomLayerExplore from "./customLayerExplore";
 import addCustomAnimationControl from "./customAnimateControl";
-import MyLayers from "../1-loadMap/loadLayers";
+import VectorLayer from "ol/layer/Vector";
+import Vector from "ol/source/Vector";
+import GeoJSON from "ol/format/GeoJSON";
 
 export default function addControls() {
   const addControlsLis = document.querySelectorAll("#map-controls li");
@@ -66,7 +68,14 @@ export default function addControls() {
   const addOverviewMap = (event: Event) => {
     map.addControl(
       new OverviewMap({
-        layers: [MyLayers.chinaGeojson],
+        layers: [
+          new VectorLayer({
+            source: new Vector({
+              url: "https://geojson.cn/api/china/100000.json",
+              format: new GeoJSON(),
+            }),
+          }),
+        ],
         collapsed: false,
         // collapsible: false,
         collapseLabel: "\u00BB",

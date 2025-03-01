@@ -1,5 +1,8 @@
 .title {
-  overflow: hidden;
+  h1 {
+    margin: 0;
+  }
+  /* overflow: hidden; */
   .draw-shape {
     position: absolute;
     right: 5%;
@@ -14,11 +17,13 @@
   }
 
   .custom-style {
-    background-color: rgb(255, 255, 255, 0.8);
+    z-index: 11;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    background-color: rgb(255, 255, 255, 0.9);
     position: absolute;
-    width: 590px;
-    bottom: 2%;
-    right: 20%;
+    width: 930px;
+    top: 2%;
+    right: 18%;
     font-size: 14px;
     padding: 5px;
     border-radius: 5px;
@@ -30,6 +35,9 @@
       width: 30px;
       height: 20px;
       padding: 0;
+    }
+    input[type="number"] {
+      width: 7%;
     }
   }
 }
