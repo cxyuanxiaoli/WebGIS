@@ -52,17 +52,16 @@ export default function showMutiSourceData() {
   map.addLayer(huadongKml);
   // map.addLayer(osmLayer);
 
-  document.querySelector("#export-png")?.addEventListener(
-    "click",
-    () => {
-      console.log("as");
-      map.once("postcompose", (evt) => {
-        const canvas = evt.context?.canvas as HTMLCanvasElement;
-        (document.querySelector("#export-png") as HTMLLinkElement).href =
-          canvas?.toDataURL();
-      });
-      map.renderSync();
-    },
-    false
-  );
+  // document.querySelector("#export-png")?.addEventListener(
+  //   "click",
+  //   () => {
+  //     map.once("rendercomplete", (evt) => {
+  //       const canvas = evt.context?.canvas as HTMLCanvasElement;
+  //       (document.querySelector("#export-png") as HTMLLinkElement).href =
+  //         canvas?.toDataURL();
+  //     });
+  //     map.renderSync();
+  //   },
+  //   false
+  // );
 }

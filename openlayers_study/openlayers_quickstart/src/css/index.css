@@ -78,3 +78,7 @@ body {
 .active {
   display: block;
 }
+
+.marker {
+  color: #ff5959;
+}

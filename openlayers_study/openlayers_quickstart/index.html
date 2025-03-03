@@ -113,7 +113,7 @@
           </ul>
         </li>
         <li>
-          <span class="caret">地图控件</span>
+          <span class=" caret">地图控件</span>
           <ul class="nested" id="map-controls">
             <li>导航控件</li>
             <li>基本操作控件</li>
@@ -124,6 +124,7 @@
             <li>全屏显示控件</li>
             <li>图层探查控件</li>
             <li>动画效果控件</li>
+            <li>测量控件</li>
           </ul>
         </li>
         <li>
@@ -132,6 +133,14 @@
             <li>图形绘制开关</li>
             <li>调整要素样式</li>
 
+          </ul>
+        </li>
+        <li>
+          <span class="caret" id="advanced-function-title">高级功能</span>
+          <ul class="nested" id="advanced-function">
+            <li>图文标注</li>
+            <li>popup标注</li>
+            <li>聚类标注</li>
           </ul>
         </li>
       </ul>
@@ -164,8 +173,26 @@
         <button class="animate-btn" id="rotate">围绕旋转</button>
         <button class="animate-btn" id="fiy">飞行定位</button>
       </div>
+      <div class="measure-menu custom-hide">
+        测量工具
+        <select id="measure-type">
+          <option value="length">长度</option>
+          <option value="area">面积</option>
+        </select>
+        使用
+        <input type="checkbox" id="geodesic">
+      </div>
+      <div class="marker-menu custom-hide">
+        标注类型
+        <select id="marker-type">
+          <option value="vector">vector</option>
+          <option value="overlay">overlay</option>
+        </select>
+        <button id="close-marker"> 关闭标注</button>
+      </div>
 
     </div>
+
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function () {

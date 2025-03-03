@@ -86,4 +86,52 @@
     z-index: 10;
     background-color: #ffffff;
   }
+
+  /* 测量控件 */
+  .measure-menu {
+    position: absolute;
+    z-index: 10;
+  }
+
+  /* 图文标注控件  */
+  .marker-menu {
+    position: absolute;
+    z-index: 10;
+    top: 4%;
+    left: 4%;
+    background-color: #fff;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  /* popup样式 */
+  .ol-popup {
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    box-sizing: border-box;
+    /* height: 100px; */
+    background-color: #fff;
+    position: relative;
+    .ol-popup-closer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+  }
+  .ol-popup::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+  }
 }
