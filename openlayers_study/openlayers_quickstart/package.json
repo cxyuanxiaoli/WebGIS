@@ -12,7 +12,12 @@
   "description": "",
   "dependencies": {
     "ol": "^10.4.0",
+    "ol-proj": "^1.1.0",
+    "proj4": "^2.15.0",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/proj4": "^2.5.6"
   }
 }

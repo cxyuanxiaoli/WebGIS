@@ -104,6 +104,7 @@ function addFeatureInfo(featureInfo: any, content: HTMLElement) {
   elemA.href = featureInfo.titleUrl;
   elemA.target = "_blank";
   setInnerText(elemA, featureInfo.title);
+  elemA.innerText = featureInfo.title;
   content.appendChild(elemA);
   const elemDiv = document.createElement("div");
   content.appendChild(elemDiv);

@@ -581,7 +581,326 @@ view.animate(
   modify.setActive(true);
   ```
 
+
+
+
+## OGC服务
+
+
+
+## 高级功能
+
+### 标注功能
+
+#### 图文标注
+
+* 通过使用矢量图层实现图文标注
+
+  1. 新建矢量图层
+
+     ```ts
+     //通过矢量图层创建标注
+     const beijing = fromLonLat([116.46, 39.92]);
+     const feature = new Feature({
+       geometry: new Point(beijing),
+       name: "Beijing",
+     });
+     const source = new VectorSource({
+       features: [feature],
+     });
+     const layer = new VectorLayer({
+       source: source,
+     });
+     map.addLayer(layer);
+     ```
+
+  2. 设置矢量图层要素样式
+
+     ```ts
+     //要素样式函数
+     function styleFunction(feature: Feature) {
+       return new Style({
+         //点要素设置为图片
+         image: new Icon({
+           anchor: [0.5, 60],
+           anchorOrigin: "top-right",
+           anchorXUnits: "fraction",
+           anchorYUnits: "pixels",
+           offsetOrigin: "top-right",
+           opacity: 0.75,
+           scale: 0.1,
+           src: "../static/img/avatar.jpg",
+         }),
+         //文本内容为要素字段/属性
+         text: new Text({
+           textAlign: "center",
+           textBaseline: "bottom",
+           font: "normal 14px sans-serif",
+           offsetY: -5,
+           text: feature.get("name"),
+           fill: new Fill({
+             color: "#000",
+           }),
+           stroke: new Stroke({
+             color: "#fff",
+             width: 2,
+           }),
+         }),
+       });
+     }
+     //设置标注样式 - 点、文本样式
+     feature.setStyle(styleFunction(feature));
+     ```
+
+* 通过添加地图覆盖层实现图文标注
+
+  1. 创建覆盖层
+
+     ```ts
+     //通过添加覆盖层创建标注
+     const wuhan = fromLonLat([114.27, 30.59]);
+     const marker = new Overlay({
+       position: wuhan,
+       positioning: "center-center",
+       element: document.createElement("div"),
+       stopEvent: false,
+     });
+     ```
+
+  2. 设置覆盖层显示文字或图片
+
+     ```ts
+     //设置标注内容，添加样式类
+     (marker.getElement() as HTMLElement).innerText = "Wuhan";
+     (marker.getElement() as HTMLElement).classList.add("marker");
+     map.addOverlay(marker);
+     ```
+
+* 实现鼠标点击添加标注
+
+  ```ts
+  //监听鼠标点击以添加标注
+  const markFun = (e: any) => {
+    let str = prompt("请输入标注内容:");
+    if (!str) {
+      return;
+    }
+    if (markerType == "vector") {
+      createVectorMarker(e.coordinate, source, str);
+    } else {
+      createOverlayLabel(e.coordinate, map, str);
+    }
+  };
+  map.on("click", markFun);
   
+  //创建覆盖层标注
+  function createOverlayLabel(coord: Coordinate, map: Map, info: string) {
+    const newMarker = document.createElement("div");
+    newMarker.classList.add("marker");
+    const marker = new Overlay({
+      position: coord,
+      stopEvent: false,
+      element: newMarker,
+    });
+    newMarker.innerText = info;
+    map.addOverlay(marker);
+  }
+  
+  //创建矢量图层标注
+  function createVectorMarker(
+    coord: Coordinate,
+    layerSource: VectorSource,
+    info: string
+  ) {
+    //创建一个要素
+    const feature = new Feature({
+      geometry: new Point(coord),
+      name: info,
+    });
+    //设置要素样式
+    feature.setStyle(styleFunction(feature));
+    //添加要素到矢量源
+    layerSource.addFeature(feature);
+  }
+  ```
+
+#### 弹窗标注
+
+* 实现点击点要素弹出相关信息弹窗
+
+  1. 创建点图层
+
+     ```ts
+     //添加点图层
+     const beijing = fromLonLat([116.46, 39.92]);
+     const shanghai = fromLonLat([121.48, 31.22]);
+     const f1 = new Feature({
+       geometry: new Point(beijing),
+       info: {
+         title: "北京市",
+         titleUrl: "",
+         text: "",
+         imgUrl: "",
+       },
+     });
+     const f2 = new Feature({...});
+     const layer = new VectorLayer({
+       source: new VectorSource({
+         features: [f1, f2],
+       }),
+       style: new Style({
+         image: new Circle({
+           radius: 5,
+           fill: new Fill({
+             color: "red",
+           }),
+         }),
+       }),
+     });
+     map.addLayer(layer);
+     ```
+
+  2. 创建popup容器，新建Overlay，添加到地图
+
+     ```ts
+     //创建popup载体
+     const container = document.createElement("div");
+     container.className = "ol-popup";
+     const closer = document.createElement("a");
+     closer.className = "ol-popup-closer";
+     closer.innerHTML = "✖";
+     const content = document.createElement("div");
+     container.appendChild(closer);
+     container.appendChild(content);
+     
+     //创建popup
+     const popup = new Overlay({
+       element: container,
+       //控制当弹出窗口显示时，地图是否自动平移以确保弹出窗口完全可见
+       autoPan: {
+         animation: { duration: 250 },
+       },
+       offset: [0, -12],
+       positioning: "bottom-center",
+       stopEvent: false,
+     });
+     map.addOverlay(popup);
+     
+     //添加关闭popup按钮事件
+     closer.onclick = () => {
+       popup.setPosition(undefined);
+       closer.blur();
+       return false; //阻止默认行为，阻止事件冒泡
+     };
+     ```
+
+  3. 绑定地图事件
+
+     ```ts
+     //添加地图点击事件，展示要素信息
+     map.on("click", (e) => {
+       //检查鼠标是否点击到要素
+       const feature = map.forEachFeatureAtPixel(e.pixel, (feature) => feature);
+       if (feature) {
+         content.innerHTML = "";
+         //向content中添加要素信息
+         addFeatureInfo(feature.get("info"), content);
+         //设置popup位置
+         const point = feature.getGeometry() as Point;
+         popup.setPosition(point.getCoordinates());
+       }
+     });
+     //添加鼠标移动事件，当移动到要素上时，更改鼠标样式
+     map.on("pointermove", (e) => {
+       const pixel = map.getEventPixel(e.originalEvent);
+       const hit = map.hasFeatureAtPixel(pixel);
+       map.getTargetElement().style.cursor = hit ? "pointer" : "default";
+     });
+     ```
+
+  4. popup内容创建函数
+
+     ```ts
+     function addFeatureInfo(featureInfo: any, content: HTMLElement) {
+       const elemA = document.createElement("a");
+       elemA.href = featureInfo.titleUrl;
+       elemA.target = "_blank";
+       elemA.innerText=featureInfo.title;
+       content.appendChild(elemA);
+       const elemDiv = document.createElement("div");
+       content.appendChild(elemDiv);
+       elemDiv.innerText=featureInfo.text;
+       const elemImg = document.createElement("img");
+       elemImg.src = featureInfo.imgUrl;
+       elemImg.style.width = "100%";
+       content.appendChild(elemImg);
+     }
+     ```
+
+#### 聚类标注
+
+```ts
+//存放样式
+const styleCache: { [key: number]: Style } = {};
+//创建聚合图层
+const layer = new VectorLayer({
+  source: new Cluster({
+    distance: 40,
+    source: new VectorSource({
+      features: createRandomFeatures(2000),
+    }),
+  }),
+  style: (feature) => {
+    //获取聚合的数量
+    const size = feature.get("features").length;
+    let style = styleCache[size];
+    if (!style) {
+      style = new Style({
+        image: new Circle({
+          radius: 10,
+          fill: new Fill({
+            color: size < 20 ? "green" : size > 40 ? "red" : "blue",
+          }),
+        }),
+        text: new Text({
+          text: size.toString(),
+          fill: new Fill({
+            color: "white",
+          }),
+        }),
+      });
+      styleCache[size] = style;
+    }
+    return style;
+  },
+});
+map.addLayer(layer);
+
+//创建随机点
+function createRandomFeatures(number: number): Feature[] {
+  const features: Feature[] = [];
+  for (let i = 0; i < number; i++) {
+    const feature = new Feature({
+      geometry: new Point(
+        fromLonLat([Math.random() * 55 + 75, Math.random() * 30 + 20])
+      ),
+      id: "point" + (i + 1),
+    });
+    features.push(feature);
+  }
+  return features;
+}
+```
+
+### 投影转换
+
+### 视图联动
+
+### 定位导航
+
+
+
+
 
 
 

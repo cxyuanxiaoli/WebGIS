@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+    }
+
+    .head {
+      height: 5vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px;
+      box-sizing: border-box;
+
+    }
+
+    .content {
+      margin: 1vh 1vw;
+      height: 93vh;
+
+      #map {
+        height: 100%;
+        border: 1px solid black;
+        box-sizing: border-box;
+        position: relative;
+
+        #locate-info {
+          position: absolute;
+          right: 1%;
+          background-color: #fff;
+          z-index: 10;
+          padding: 5px;
+          border-radius: 5px;
+          box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+
+    .marker-container {
+      /* width: 70px; */
+      background-color: #fff;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      padding: 5px;
+
+      &::after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #fff;
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="head">
+    <h1>Map Location</h1>
+    <div>
+      <input type="checkbox" id="track">
+      开启定位
+    </div>
+    <div>
+      <button id="simulate-btn">模拟运行轨迹</button>
+    </div>
+
+    <a href="../../../../index.html">返回</a>
+  </div>
+  <div class="content">
+    <div id="map">
+      <div id="locate-info">
+        <p>位置精度：<code id="accuracy">1</code></p>
+        <p>海拔高度：<code id="altitude"></code></p>
+        <p>海拔精度：<code id="altitudeAccuracy"></code></p>
+        <p>航向：<code id="heading"></code></p>
+        <p>速度：<code id="speed"></code></p>
+      </div>
+    </div>
+  </div>
+  <script src="index.ts" type="module"></script>
+</body>
+
+</html>

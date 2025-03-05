@@ -6,6 +6,7 @@ import { fromLonLat } from "ol/proj";
 import { Circle, Fill, Icon, Stroke, Style, Text } from "ol/style";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
+import { FeatureLike } from "ol/Feature";
 
 export default function addTextImgMarker(map: Map) {
   //获取marker类型选择元素
@@ -111,7 +112,7 @@ function styleFunction(feature: Feature) {
       }),
     }),
     // image: new Icon({
-    //   // anchor: [0.5, 60],
+    //  // anchor: [0.5, 60],
     //   anchorOrigin: "top-right",
     //   anchorXUnits: "fraction",
     //   anchorYUnits: "pixels",

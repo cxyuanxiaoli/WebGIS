@@ -7,7 +7,9 @@ import VectorSource from "ol/source/Vector";
 import { Circle, Fill, Style, Text } from "ol/style";
 
 export default function addClusterMarker(map: Map) {
+  //存放样式
   const styleCache: { [key: number]: Style } = {};
+  //创建聚合图层
   const layer = new VectorLayer({
     source: new Cluster({
       distance: 40,
@@ -16,6 +18,7 @@ export default function addClusterMarker(map: Map) {
       }),
     }),
     style: (feature) => {
+      //获取聚合的数量
       const size = feature.get("features").length;
       let style = styleCache[size];
       if (!style) {
@@ -35,13 +38,13 @@ export default function addClusterMarker(map: Map) {
         });
         styleCache[size] = style;
       }
-
       return style;
     },
   });
   map.addLayer(layer);
 }
 
+//创建随机点
 function createRandomFeatures(number: number): Feature[] {
   const features: Feature[] = [];
   for (let i = 0; i < number; i++) {
