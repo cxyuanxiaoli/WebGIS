@@ -20,9 +20,18 @@ export default function drawShape() {
       document.querySelector(".custom-style")?.classList.toggle("custom-hide");
     });
 
+  const modify = () => {
+    modifyShape();
+    document
+      .querySelectorAll("#draw-shapes li")[2]
+      .removeEventListener("click", modify);
+  };
+  document
+    .querySelectorAll("#draw-shapes li")[2]
+    .addEventListener("click", modify);
+
   drawCustomShape();
   customStyle();
-  modifyShape();
 }
 
 //图形绘制函数

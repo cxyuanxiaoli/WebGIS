@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+}
+
+.head {
+  padding: 1vh 1vw;
+  height: 3vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content {
+  height: 93vh;
+  padding: 1vh 1vw;
+
+  #map {
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+  }
+}
+
+#dialog-confirm,
+#dialog-delete {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  background-color: #fff;
+  top: 2%;
+  left: 20px;
+  /* width: 30vw; */
+}
+.hide {
+  display: none;
+}
+
+.popup {
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+}

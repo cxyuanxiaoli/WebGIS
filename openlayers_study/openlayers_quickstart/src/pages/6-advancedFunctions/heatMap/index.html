@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    .head {
+      padding: 1vh 1vw;
+      height: 3vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .content {
+      height: 93vh;
+      padding: 1vh 1vw;
+
+      #map {
+        width: 100%;
+        height: 100%;
+        border: 1px solid black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="head">
+    <h1>Heat Map</h1>
+    <div>热点半径
+      <input type="range" id="radius" min="1" max="50" value="10">
+    </div>
+    <div>模糊尺寸
+      <input type="range" id="blur" min="1" max="50" value="10">
+    </div>
+    <a href="../../../../index.html"> 返回</a>
+  </div>
+  <div class="content">
+    <div id="map"></div>
+  </div>
+  <script type="module" src="index.ts"></script>
+</body>
+
+</html>

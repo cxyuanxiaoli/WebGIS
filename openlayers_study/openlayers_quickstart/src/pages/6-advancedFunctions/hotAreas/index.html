@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <div class="head">
+    <h1>Hot Areas</h1>
+    <div>
+      热区功能：
+      <button class="btn" id="showReg">显示热区</button>
+      <button class="btn" id="drawReg">绘制热区</button>
+      <button class="btn" id="deleteReg">删除热区</button>
+    </div>
+    <a href="../../../../index.html"> 返回</a>
+  </div>
+  <div class="content">
+    <div id="map"></div>
+  </div>
+  <div id="dialog-confirm" class="hide">
+    信息类别(info Type):省GDP<br>
+    省名:<br>
+    <input type="text" value="" id="name"><br>
+    编号:<br>
+    <input type="text" value="" id="ID"><br>
+    2015年GDP:<br>
+    <input type="text" placeholder="亿元" value="" id="gdp-2015"><br>
+    2016年GDP:<br>
+    <input type="text" placeholder="亿元" value="" id="gdp-2016"><br>
+    2017年GDP:<br>
+    <input type="text" placeholder="亿元" value="" id="gdp-2017"><br>
+    <button id="add-confirm">确定</button>
+    <button id="add-cancel">取消</button>
+  </div>
+  <div id="dialog-delete" class="hide">
+    <p>确认删除热区?</p>
+    <button id="delete-confirm">确定</button>
+    <button id="delete-cancel">取消</button>
+  </div>
+  <script type="module" src="index.ts"></script>
+</body>
+
+</html>
