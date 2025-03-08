@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100% vh;
+    }
+
+    .title {
+      height: 5vh;
+      padding: 1vh 1vw;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .content {
+      height: 95vh;
+      box-sizing: border-box;
+      padding: 1vh 1vw;
+
+      #map {
+        background-color: rgba(0, 37, 117, 0.5);
+        height: 100%;
+        width: 100%;
+        border: 1px solid #ccc;
+
+        .ol-mouse-position {
+          position: absolute;
+          top: auto;
+          bottom: 2%;
+          right: 2%;
+        }
+
+        .popup {
+          background-color: #fff;
+          border-radius: 10px;
+
+          #chartContainer {
+            width: 500px;
+            height: 320px;
+          }
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="title">
+    <h1>Statistical Chart</h1>
+    <a href="../../../../index.html">返回</a>
+
+  </div>
+  <div class="content">
+    <div id="map"></div>
+  </div>
+  <script type="module" src="index.ts"></script>
+</body>
+
+</html>

@@ -21,6 +21,7 @@ export default function drawShape() {
     });
 
   const modify = () => {
+    document.querySelector(".select-shape")?.classList.remove("custom-hide");
     modifyShape();
     document
       .querySelectorAll("#draw-shapes li")[2]

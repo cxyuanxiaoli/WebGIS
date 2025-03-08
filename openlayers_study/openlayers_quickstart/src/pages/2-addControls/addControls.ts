@@ -12,7 +12,7 @@ import customLayersListControl from "./customLayersListControl";
 import { createStringXY } from "ol/coordinate";
 import addCustomLayerExplore from "./customLayerExplore";
 import addCustomAnimationControl from "./customAnimateControl";
-// import addCustomMeasureControl from "./customMeasureControl";
+import addCustomMeasureControl from "./customMeasureControl";
 import VectorLayer from "ol/layer/Vector";
 import Vector from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
@@ -103,7 +103,7 @@ export default function addControls() {
   };
   //添加测量控件
   const addMeasureControl = (event: Event) => {
-    // addCustomMeasureControl();
+    addCustomMeasureControl();
     document.querySelector(".measure-menu")?.classList.remove("custom-hide");
     event.target?.removeEventListener("click", addMeasureControl);
   };
@@ -118,7 +118,7 @@ export default function addControls() {
     addFullScreen,
     addLayerExplorer,
     addAnimationControl,
-    // addMeasureControl,
+    addMeasureControl,
   ];
 
   //绑定事件

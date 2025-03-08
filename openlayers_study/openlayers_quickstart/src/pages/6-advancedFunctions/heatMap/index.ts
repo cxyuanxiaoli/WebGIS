@@ -49,7 +49,7 @@ function createRandomFeatures(number: number): Feature[] {
   for (let i = 0; i < number; i++) {
     const feature = new Feature({
       geometry: new Point([Math.random() * 55 + 75, Math.random() * 30 + 20]),
-      weight: Math.random() * 80 + 2,
+      weight: Math.random() * 8 + 2,
     });
     features.push(feature);
   }

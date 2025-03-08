@@ -380,6 +380,109 @@ view.animate(
 );
 ```
 
+#### 测量控件
+
+需先学习`图形绘制`和`高级功能/标注功能`
+
+1. 创建测量矢量图层
+
+   ```ts
+   const source = new VectorSource();
+   const layer = new VectorLayer({
+     source: source,
+     style: new Style({
+       fill: new Fill({
+         color: "rgba(117, 117, 117, 0.2)",
+       }),
+       stroke: new Stroke({
+         color: "#ffcc33",
+         width: 2,
+       }),
+     }),
+   });
+   layer.set("name", "测量图层");
+   map.addLayer(layer);
+   ```
+
+2. 创建绘制交互绘制图层，计算长度、面积属性
+
+   ```ts
+   //测量类型
+   let measureType = typeSelect.value;
+   //是否使用地理测量
+   let isUseGeodesic = geodesicCheckbox.checked;
+   //初始化绘制交互
+   let draw: Draw = updateDraw(measureType, isUseGeodesic, source);
+   map.addInteraction(draw);
+   //根据条件更新绘制交互
+   function updateDraw(type: string, useGeodesic: boolean, drawSource: VectorSource): Draw {
+     let draw: Draw;
+     if (type === "length") {
+       draw = new Draw({
+         source: drawSource,
+         type: "LineString",      //绘制线段
+       });
+       draw.on("drawend", (evt: DrawEvent) => {
+         const line = evt.feature.getGeometry() as LineString;
+         const lastCoord = line.getLastCoordinate();    //获取绘制线要素的最后一点
+         //计算线要素的地理坐标下长度和平面坐标下长度
+         const length = (useGeodesic ? getLength(line) : line.getLength()) / 1000;
+         createMarker(lastCoord, `${length.toFixed(2)} 千米`);    //创建弹窗显示结果
+       });
+     } else {
+       draw = new Draw({
+         source: drawSource,
+         type: "Polygon",
+       });
+       draw.on("drawend", (evt: DrawEvent) => {
+         const polygon = evt.feature.getGeometry() as Polygon;
+         const centerCoord = polygon.getInteriorPoint().getCoordinates();
+         const area =
+           (useGeodesic ? getArea(polygon) : polygon.getArea()) / 1000000;
+         createMarker(centerCoord, `${area.toFixed(2)} 平方千米`);
+       });
+     }
+     return draw;
+   }
+   ```
+
+3. 创建popup弹窗显示测量结果
+
+   ```ts
+   //coord,弹窗放置的坐标   info,弹窗显示的信息
+   function createMarker(coord: Coordinate, info: string) {
+     const container = document.createElement("div");
+     container.className = "measure-popup";
+     container.innerText = info;
+     const marker = new Overlay({
+       element: container,
+       offset: [0, -25],
+       position: coord,
+       positioning: "center-center",
+       stopEvent: false,
+     });
+     map.addOverlay(marker);
+   }
+   ```
+
+4. 监听事件，更新绘制交互
+
+   ```ts
+   //测量切换事件
+   typeSelect.onchange = (e) => {
+     measureType = typeSelect.value;
+     map.removeInteraction(draw);
+     draw = updateDraw(measureType, isUseGeodesic, source);
+     map.addInteraction(draw);
+   };
+   geodesicCheckbox.onchange = (e) => {
+     isUseGeodesic = geodesicCheckbox.checked;
+     map.removeInteraction(draw);
+     draw = updateDraw(measureType, isUseGeodesic, source);
+     map.addInteraction(draw);
+   };
+   ```
+
 ## 图形绘制
 
 ### 绘制几何图形
@@ -502,7 +605,7 @@ view.animate(
 
 ### 自定义要素样式
 
-* layer.setStyle(style)          修改矢量图层要素样式
+* `layer.setStyle(style)  `        修改矢量图层要素样式
 
 * 点的样式
 
@@ -567,21 +670,81 @@ view.animate(
 
 ### 选择和修改要素
 
-* 为map添加选择、修改交互
+* 多种方式选择要素
+
+  1. 鼠标单击选择要素
+
+     ```ts
+     import { never, singleClick } from "ol/events/condition";
+     
+     const select = new Select({
+       condition: singleClick,         //触发事件类型
+       style: selectStyle,             //被选中要素的样式
+       //layers: [],               //可以被选择的图层
+       filter: (feature, layer) => {            //过滤器，当返回true时表示可以被选中
+         // return layer instanceof VectorLayer;       //只选择矢量图层
+         return feature.getGeometry() instanceof Point;      //只选择点要素
+       },
+     });
+     ```
+
+  2. 自定义范围选择要素(框选，圈选，自定义区域选择...)
+
+     ```ts
+     //绘制交互
+     let draw: Draw;
+     //临时绘制层
+     const drawLayer = new VectorLayer({
+       source: new VectorSource(),
+     });
+     drawLayer.getSource()?.on("addfeature", () => {
+       drawLayer.getSource()?.clear(); //绘制图形结束后清空绘制层
+     });
+     map.addLayer(drawLayer);
+     
+     //实现框选要素
+     let select: Select = new Select({
+       condition: never,
+       style: selectStyle,
+     });
+     draw = new Draw({
+       source: drawLayer.getSource() as VectorSource,
+       type: "Circle",
+       geometryFunction: createBox(),
+     });
+     draw.setActive(true);
+     
+     draw.on("drawstart", () => {
+       select.getFeatures().clear();
+     });
+     draw.on("drawend", (e) => {
+       //获取绘制图形范围
+       const extent = e.feature.getGeometry()?.getExtent() as number[];
+       //选取所有矢量图层中与绘制图形范围相交的要素放到选择交互的要素集合中
+       map.getLayers().forEach((layer) => {
+         if (layer instanceof VectorLayer) {
+           (layer as VectorLayer)
+             .getSource()
+             ?.forEachFeatureIntersectingExtent(extent, (feature) => {
+               select.getFeatures().push(feature);
+             });
+         }
+       });
+     });
+     map.addInteraction(draw);
+     map.addInteraction(select);
+     ```
+
+* 修改要素
 
   ```ts
-  const select = new Select();
   const modify = new Modify({
     features: select.getFeatures(),
   });
-  map.addInteraction(select);
-  map.addInteraction(modify);
   
-  select.setActive(true);
+  map.addInteraction(modify);
   modify.setActive(true);
   ```
-
-
 
 
 ## OGC服务
@@ -894,9 +1057,337 @@ function createRandomFeatures(number: number): Feature[] {
 
 ### 投影转换
 
+1. 安装proj4相关依赖
+
+   ```cmd
+   npm install proj4
+   npm install @types/proj4 -D
+   ```
+
+2. 使用proj4定义坐标系
+
+   ```ts
+   // 定义球形摩尔魏特投影坐标系，对应ESRI编号为 53009
+   proj4.defs(
+     "ESRI:53009",
+     "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m +no_defs"
+   );
+   ```
+
+3. 将定义注册到openlayers中，定义投影
+
+   ```ts
+   import { register } from "ol/proj/proj4";
+   import { fromLonLat, Projection } from "ol/proj";
+   //注册到OpenLayers
+   register(proj4);
+   //定义球形摩尔魏特投影坐标系
+   const sphereMollweideProj = new Projection({
+     code: "ESRI:53009",
+     extent: [
+       -9009954.605703328, -9009954.605703328, 9009954.605703328,
+       9009954.605703328,
+     ],
+     worldExtent: [-179, -90, 179, 90],
+   });
+   ```
+
+4. 使用定义坐标系
+
+   ```ts
+   transformMap = new Map({
+     target: "map2",
+     layers: [
+       new VectorLayer({
+         source: new Vector({
+           url: "https://geojson.cn/api/china/100000.json",
+           format: new GeoJSON(),
+         }),
+       }),
+     ],
+     view: new View({
+       center: fromLonLat([116.397428, 39.90816]),
+       projection: sphereMollweideProj,
+       zoom: 3,
+     }),
+   });
+   ```
+
 ### 视图联动
 
+* 将副图的view对象指向主图的view对象
+
+  ```ts
+  const map1 = new Map({
+    target: "map1",
+    layers: [],
+    view: new View({
+      center: fromLonLat([116.397428, 39.90816]),
+      zoom: 5,
+      projection: "EPSG:3857",
+    }),
+  });
+  
+  const map2 = new Map({
+    target: "map2",
+    layers: [],
+    view: map1.getView(),
+  });
+  ```
+
 ### 定位导航
+
+* 创建定位导航对象
+
+  ```ts
+  import { Geolocation } from "ol";
+  //创建定位导航对象
+  const geoLocation = new Geolocation({
+    projection: map.getView().getProjection(),
+    //追踪参数
+    trackingOptions: {
+      maximumAge: 10000, // 允许使用10秒内的缓存位置
+      enableHighAccuracy: true,
+      timeout: 600000,
+    },
+  });
+  ```
+
+* 开启位置追踪
+
+  ```ts
+  geoLocation.setTracking(true);
+  ```
+
+* 监听事件
+
+  ```ts
+  //位置变化时更新信息
+  geoLocation.on("change", () => {
+    const accuracy = geoLocation.getAccuracy();      //定位精度
+    const altitude = geoLocation.getAltitude();      //定位高程
+    const altitudeAccuracy = geoLocation.getAltitudeAccuracy();     //高程精度
+    const heading = geoLocation.getHeading();        //设备朝向
+    const speed = geoLocation.getSpeed();            //速度
+    const position = geoLocation.getPosition() as Coordinate;     //定位位置
+  });
+  
+  //位置获取失败时处理
+  geoLocation.on("error", function (error) {
+    console.log("Geolocation error occurred: ", error);
+  });
+  ```
+
+### 热点图
+
+```ts
+import Heatmap from "ol/layer/Heatmap";
+
+const radius = document.querySelector("#radius") as HTMLInputElement;
+const blur = document.querySelector("#blur") as HTMLInputElement;
+//创建热点图层
+const heatmap = new Heatmap({
+  source: new VectorSource({
+    features: createRandomFeatures(1000),
+  }),
+  radius: parseInt(radius.value, 10),      //热点半径
+  blur: parseInt(blur.value, 10),		   //模糊尺寸
+  weight: (feature: Feature) => {          //每个要素的权重
+    return feature.get("weight") as number;
+  },
+});
+map.addLayer(heatmap);
+radius.onchange = () => {
+  heatmap.setRadius(parseInt(radius.value, 10));   //重新设置半径
+};
+blur.onchange = () => {
+  heatmap.setBlur(parseInt(blur.value, 10));      //设置模糊尺寸
+};
+
+//创建随机点
+function createRandomFeatures(number: number): Feature[] {
+  const features: Feature[] = [];
+  for (let i = 0; i < number; i++) {
+    const feature = new Feature({
+      geometry: new Point([Math.random() * 55 + 75, Math.random() * 30 + 20]),
+      weight: Math.random() * 8 + 2,     //给每个点添加权重信息
+    });
+    features.push(feature);
+  }
+  return features;
+}
+```
+
+### 热区功能
+
+1. 创建常规矢量图层和热区矢量图层，设置不同样式
+
+   ```ts
+   const map = new Map({
+     target: "map",
+     layers: [],
+     view: new View({
+       center: [116, 36],
+       zoom: 5,
+       projection: "EPSG:4326",
+     }),
+   });
+   //数据层样式
+   const normalStyle = new Style({
+     fill: new Fill({
+       color: "rgba(7, 139, 255, 0.2)",
+     }),
+     stroke: new Stroke({
+       color: "#aa33aa",
+       width: 2,
+     }),
+   });
+   //热区层样式
+   const flashStyle = new Style({
+     fill: new Fill({
+       color: "rgba(255, 25, 0, 0.5)",
+     }),
+     stroke: new Stroke({
+       color: "#ff0000",
+       width: 2,
+     }),
+   });
+   //数据层
+   const vectorLayer = new VectorLayer({
+     source: new VectorSource({
+       url: "https://geojson.cn/api/china/100000.json",
+       format: new GeoJSON(),
+     }),
+     style: normalStyle,
+     opacity: 0.5,
+   });
+   map.addLayer(vectorLayer);
+   //热区层
+   const hotAreaLayer = new VectorLayer({
+     source: new VectorSource({}),
+     style: flashStyle,
+     opacity: 1,
+   });
+   map.addLayer(hotAreaLayer);
+   hotAreaLayer.setVisible(false);   //隐藏热区层
+   ```
+
+2. 创建popup弹窗
+
+   ```ts
+   //创建popup弹窗
+   const popupDiv = document.createElement("div");
+   popupDiv.innerHTML = "";
+   popupDiv.className = "popup";   //通过类设置样式
+   const popup = new Overlay({
+     element: popupDiv,
+     positioning: "bottom-center",
+     stopEvent: false,
+   });
+   map.addOverlay(popup);
+   ```
+
+3. 添加地图事件，实现鼠标悬浮元素高亮显示并使用popup展示其相关信息
+
+   ```ts
+   //前一个热区要素
+   let preFeature: Feature | null = null;
+   //当前热区要素是否和前一个热区要素相同
+   let flag: boolean = false;
+   map.on("pointermove", pointerMoveHandler);
+   function pointerMoveHandler(event: MapBrowserEvent<any>) {
+     const pixel = event.pixel;   // map.getEventPixel(event.originalEvent);
+     const hit = map.hasFeatureAtPixel(pixel);
+     map.getTargetElement().style.cursor = hit ? "pointer" : "";
+     //当前没有指向要素
+     if (!hit) {
+       preFeature = null;
+       popup.setPosition(undefined);
+       hotAreaLayer.setVisible(false);
+       return;
+     }
+     //获取当前鼠标位置的要素
+     const feature = map.forEachFeatureAtPixel(
+       pixel,
+       (feature) => feature
+     ) as Feature;
+   
+     if (preFeature === feature) {
+       flag = true;
+     } else {
+       flag = false;
+       preFeature = feature;
+     }
+     //当前要素和前一个要素不同
+     if (!flag) {
+       hotAreaLayer.getSource()?.clear();
+       hotAreaLayer.getSource()?.addFeature(feature);
+       hotAreaLayer.setVisible(true);
+       (popup.getElement() as HTMLElement).innerText = `${feature.get("name")}\n${feature.get("GDP_2015")}\n${feature.get("GDP_2016")}\n${feature.get("GDP_2017")}`;
+     }
+     popup.setPosition(event.coordinate);
+   }
+   ```
+
+### 统计图
+
+1. 安装echarts
+
+   ```cmd
+   npm i echarts
+   ```
+
+2. 创建popup弹窗
+
+   ```ts
+   //popup弹窗
+   const popupContainter = document.createElement("div");
+   popupContainter.className = "popup";
+   const chartContainer = document.createElement("div");
+   chartContainer.id = "chartContainer";
+   popupContainter.appendChild(chartContainer);
+   const popup = new Overlay({
+     element: popupContainter,
+     positioning: "bottom-center",
+     stopEvent: false,
+   });
+   map.addOverlay(popup);
+   ```
+
+3. 创建图表
+
+   ```ts
+   //创建图表
+   const myChart = echarts.init(
+     document.querySelector(`#chartContainer`) as HTMLElement
+   );
+   function createChart(data: number[], title: string) {
+     const option: echarts.EChartOption = {
+       xAxis: {
+         type: "category",
+         data: ["1994", "1997", "1998", "1999", "2000"],
+       },
+       yAxis: {
+         type: "value",
+       },
+       series: [
+         {
+           data,
+           type: "line",
+         },
+       ],
+       title: {
+         text: title + " GDP",
+         left: "center",
+       },
+     };
+     myChart.setOption(option);
+   }
+   ```
+
+### 军事标绘
+
+
 
 
 

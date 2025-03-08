@@ -41,9 +41,9 @@ const features = new GeoJSON().readFeatures(data);
 //数据层
 const vectorLayer = new VectorLayer({
   source: new VectorSource({
-    features: [...features],
-    // url: "https://geojson.cn/api/china/100000.json",
-    // format: new GeoJSON(),
+    // features: [...features],
+    url: "https://geojson.cn/api/china/100000.json",
+    format: new GeoJSON(),
   }),
   style: normalStyle,
   opacity: 0.5,
