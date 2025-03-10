@@ -173,10 +173,15 @@ interface ISimulateData {
 }
 type SimulateDataArr = ISimulateData[];
 
+const getSimulateData = async () => {
+  return await (await fetch("../../../../static/data/simulate.json")).json();
+};
+
 //读取轨迹数据
-const simulateData = (await (
-  await fetch("../../../../static/data/simulate.json")
-).json()) as SimulateDataArr;
+let simulateData: SimulateDataArr;
+getSimulateData().then((data) => {
+  simulateData = data;
+});
 
 const simulateBtn = document.querySelector(
   "#simulate-btn"

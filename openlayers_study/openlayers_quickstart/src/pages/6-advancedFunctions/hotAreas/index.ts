@@ -36,8 +36,8 @@ const flashStyle = new Style({
 });
 
 //加载数据
-const data = await (await fetch("./data.json")).json(); //从后端获取数据
-const features = new GeoJSON().readFeatures(data);
+// const data = await (await fetch("./data.json")).json(); //从后端获取数据
+// const features = new GeoJSON().readFeatures(data);
 //数据层
 const vectorLayer = new VectorLayer({
   source: new VectorSource({

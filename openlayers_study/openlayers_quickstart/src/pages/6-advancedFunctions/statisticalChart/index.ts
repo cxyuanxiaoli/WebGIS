@@ -1,5 +1,5 @@
 import { Feature, Graticule, Map, Overlay, View } from "ol";
-import { defaults, MousePosition } from "ol/control";
+import { defaults, FullScreen, MousePosition } from "ol/control";
 import { createStringXY } from "ol/coordinate";
 import KML from "ol/format/KML";
 import VectorLayer from "ol/layer/Vector";
@@ -20,6 +20,7 @@ const map = new Map({
       projection: "EPSG:4326",
       coordinateFormat: createStringXY(4),
     }),
+    new FullScreen(),
   ]),
 });
 
@@ -118,6 +119,7 @@ map.on("pointermove", (evt) => {
     highlightLayer.getSource()?.clear();
     highlightLayer.getSource()?.addFeature(feature);
   }
+
   popup.setPosition(evt.coordinate);
 });
 
