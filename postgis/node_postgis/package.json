@@ -1,7 +1,7 @@
 {
   "name": "node_postgis",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec ts-node app.ts"
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.10",
+    "@types/pg": "^8.11.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   }

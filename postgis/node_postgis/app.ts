@@ -1,37 +1,42 @@
-const express = require("express");
-const sqlConfig = require("./config/postgres");
-const { Pool } = require("pg");
+import express from "express";
+import { Pool } from "pg";
+import sqlConfig from "./config/postgres"; // 你的数据库配置
 
 const app = express();
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
+const pool = new Pool(sqlConfig); // 创建连接池
 
-const pool = new Pool(sqlConfig);
-
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error("错误连接数据库", err.stack);
-  }
-  console.log("成功连接数据库");
-  console.log("成功连接数据库");
-  release();
-});
-
-pool.query(
-  {
-    text: "select name,ST_AsGeoJSON(geom) from geometries where name = $1",
-    values: ["Point"],
-  },
-  (err, res) => {
-    if (err) {
-      return console.error("错误执行查询", err.stack);
+// 定义一个路由来处理请求
+app.get("/data", (req, res) => {
+  pool.query(
+    {
+      text: "select name,ST_AsGeoJSON(geom) from geometries",
+      values: [],
+    },
+    (err, pgResult) => {
+      if (err) {
+        return console.error("查询执行错误", err.stack);
+      }
+      // 注意：这里pgResult是查询结果，res是express的响应对象，不要混淆
+      res.json(pgResult.rows); // 将查询结果以JSON格式发送给客户端
     }
-    console.log(res.rows);
-    pool.end(); // 关闭连接池
-  }
-);
+  );
+});
 
 app.listen(8080, () => {
-  console.log("Server is running on port 8080");
+  console.log("服务器正在运行在端口 8080");
+});
+
+// 监听进程关闭信号以优雅地关闭服务器和连接池
+process.on("SIGINT", () => {
+  pool.end(() => {
+    console.log("连接池关闭成功");
+    process.exit(0); // 退出进程
+  });
+});
+
+process.on("SIGTERM", () => {
+  pool.end(() => {
+    console.log("连接池关闭成功");
+    process.exit(0); // 退出进程
+  });
 });
