@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebGIS 系统</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <link rel="stylesheet" href="css/ol.css" />
+    <link rel="stylesheet" href="css/olControlReset.css" />
+  </head>
+
+  <body>
+    <div class="header">WebGIS 系统</div>
+    <div class="map">
+      <div id="map1" class="full-map"></div>
+      <div id="map2" class="no-map"></div>
+      <div class="tools-bar">
+        <div id="link-view">视图链接</div>
+        <div id="map-look" class="tool">地图浏览</div>
+        <div id="draw-tool" class="tool">图形绘制</div>
+        <div id="symbol-tool" class="tool">符号设置</div>
+        <div id="layer-toggle">图层管理</div>
+      </div>
+      <div class="tools-container">
+        <div class="tool map-look">
+          <select name="type" id="map-look-type">
+            <option value="xzq">行政区</option>
+            <option value="jwd">经纬度</option>
+          </select>
+          <select name="province" id="map-look-province">
+            <option value="">请选择</option>
+          </select>
+          <select name="city" id="map-look-city">
+            <option value="">请选择</option>
+          </select>
+          <input
+            placeholder="经度"
+            type="number"
+            id="map-look-jd"
+            class="hide"
+          />
+          <input
+            placeholder="纬度"
+            type="number"
+            id="map-look-wd"
+            class="hide"
+          />
+          <select name="move-type" id="map-look-move-type">
+            <option value="no-animate">无动画</option>
+            <option value="rotate">旋转定位</option>
+            <option value="bounce">弹性定位</option>
+            <option value="fly">飞行定位</option>
+          </select>
+          <button id="map-look-confirm">确定</button>
+        </div>
+        <div class="tool draw-tool">
+          <button id="draw-tool-add">添加新图层</button>
+          <div class="btn" id="draw-tool-start">开始绘制</div>
+          <select name="type" id="draw-tool-type">
+            <option value="Point">点</option>
+            <option value="LineString">线</option>
+            <option value="Polygon">面</option>
+            <option value="Rectangle">矩形</option>
+            <option value="Circle">圆</option>
+          </select>
+          <div>
+            <input type="checkbox" name="snap" id="draw-tool-snap" disabled />
+            <label for="draw-tool-snap">捕捉</label>
+          </div>
+          <div class="btn" id="draw-tool-select">选择图形</div>
+          <button id="draw-tool-delete" disabled>删除图形</button>
+        </div>
+        <div class="tool symbol-tool">
+          <select name="layer" id="symbol-tool-layer">
+            <option value="">请选择图层</option>
+          </select>
+          <div class="single-value">
+            <div class="point">
+              <label>点</label>
+              <input
+                type="number"
+                id="symbol-point-size"
+                value="5"
+                min="1"
+                max="20"
+              />
+              <input type="color" id="symbol-point-color" />
+            </div>
+
+            <div class="line">
+              <label>线</label>
+              <input
+                type="number"
+                id="symbol-line-width"
+                value="2"
+                min="1"
+                max="20"
+              />
+              <input type="color" id="symbol-line-color" />
+            </div>
+
+            <div class="polygon">
+              <label>面</label>
+              <input
+                type="number"
+                id="symbol-fill-opacity"
+                value="0.6"
+                min="0.1"
+                max="1"
+                step="0.1"
+              />
+              <input type="color" id="symbol-fill-color" />
+            </div>
+          </div>
+          <button id="symbol-tool-confirm">确定</button>
+        </div>
+      </div>
+      <div class="layer-panel hide"></div>
+      <div id="locate-tool">定位服务</div>
+    </div>
+    <div class="footer">@Copyright 2025 地信222 李哲</div>
+    <script type="module" src="./js/index.js"></script>
+  </body>
+</html>

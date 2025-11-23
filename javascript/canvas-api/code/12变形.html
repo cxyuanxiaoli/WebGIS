@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <img id="img" src="./img/_.jpg" style="display: none" />
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 600;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillRect(0, 0, 150, 150);
+      ctx.save();
+      ctx.fillStyle = "blue";
+      ctx.fillRect(20, 20, 110, 110);
+      ctx.save();
+      ctx.fillStyle = "red";
+      ctx.fillRect(40, 40, 70, 70);
+      ctx.restore();
+      ctx.fillRect(55, 55, 40, 40);
+      ctx.restore();
+      ctx.fillRect(65, 65, 20, 20);
+
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          ctx.save();
+          ctx.fillStyle = `rgb(${255 - i * j * 60},0,0)`;
+          ctx.translate(200 + j * 70, i * 70);
+          ctx.fillRect(0, 0, 50, 50);
+          ctx.restore();
+        }
+      }
+      ctx.fillRect(400, 0, 100, 100);
+
+      ctx.save();
+      ctx.translate(600, 200);
+      for (let i = 0; i < 30; i++) {
+        ctx.save();
+        ctx.rotate((i * Math.PI) / 15);
+        ctx.fillRect(-2, -100, 4, 200);
+        ctx.restore();
+      }
+      ctx.restore();
+      ctx.fillRect(600, 0, 100, 50);
+
+      ctx.save();
+      ctx.translate(0, canvas.height);
+      ctx.scale(1, -1);
+      ctx.fillRect(0, 0, 100, 100);
+      console.log(ctx.getTransform());
+      ctx.restore();
+
+      ctx.setTransform(1, 0, 0, -1, canvas.width / 2, canvas.height / 2 + 240);
+      ctx.fillRect(-10, -10, 20, 20);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(400, 0);
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, 400);
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.resetTransform();
+      ctx.fillRect(0, 200, 100, 100);
+    </script>
+  </body>
+</html>

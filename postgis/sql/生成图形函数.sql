@@ -1,1 +1,0 @@
-select ST_AsText(ST_Buffer('Point(0 0)',10))

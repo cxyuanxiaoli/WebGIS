@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <img id="img" src="./img/_.jpg" style="display: none" />
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 600;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+
+      const img = new Image();
+      img.src =
+        "https://bpic.588ku.com/element_origin_min_pic/23/07/11/d32dabe266d10da8b21bd640a2e9b611.jpg!r650";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 200, 200);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 100, 100, 200, 200, 300, 100, 200, 200);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(img, 100, 100, 200, 200, 500, 100, 200, 200);
+      };
+      document.body.appendChild(img);
+
+      const img2 = document.querySelector("#img");
+      img2.onload = () => {
+        ctx.drawImage(img2, 200, 0);
+      };
+    </script>
+  </body>
+</html>

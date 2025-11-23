@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1000;
+      canvas.height = 400;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      //绘制圆弧
+      ctx.lineWidth = 5;
+      ctx.arc(100, 100, 100, 0, Math.PI / 2, false);
+      ctx.stroke();
+
+      //绘制笑脸-描边
+      ctx.beginPath();
+      ctx.arc(400, 200, 180, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(330, 150, 40, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(470, 150, 40, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(400, 230, 100, 0, Math.PI);
+      ctx.stroke();
+
+      //绘制椭圆弧-填充
+      ctx.fillStyle = "pink";
+      ctx.beginPath();
+      ctx.ellipse(700, 200, 100, 30, 0, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.save();
+      ctx.stroke();
+      ctx.fillStyle = "skyblue";
+      ctx.beginPath();
+      ctx.ellipse(700, 200, 60, 80, 0, 0, 2 * Math.PI);
+      ctx.fill();
+
+      //绘制圆-填充样式调整
+      ctx.beginPath();
+      ctx.arc(900, 200, 50, 0, 2 * Math.PI);
+      const gradient = ctx.createRadialGradient(875, 175, 0, 875, 175, 75);
+      gradient.addColorStop(0, "white");
+      gradient.addColorStop(1, "black");
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    </script>
+  </body>
+</html>

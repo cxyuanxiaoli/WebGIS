@@ -1,0 +1,1 @@
+{"name":"depart","fields":["id","name"],"columns":[{"id":1,"name":"行政部门"},{"id":2,"name":"财务部门"},{"id":3,"name":"销售部门"},{"id":4,"name":"产品部门"},{"id":5,"name":"技术部门"},{"id":6,"name":"运营部门"}]}

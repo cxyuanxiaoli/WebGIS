@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/ol.css" />
+    <link rel="stylesheet" href="./css/olControlReset.css" />
+    <link rel="stylesheet" href="./css/index.css" />
+  </head>
+  <body>
+    <div class="maps">
+      <div id="map"></div>
+      <div id="right-map"></div>
+    </div>
+    <div class="search">
+      <div>
+        <input class="search-input" type="text" placeholder="景点搜索" />
+        <button id="search-btn">搜索</button>
+        <button id="clear-btn">ⓧ</button>
+      </div>
+      <ul class="suggestions"></ul>
+    </div>
+    <div class="btns">
+      <div id="btn-link-view">视图链接</div>
+      <div id="btn-layer-panel">图层面板</div>
+    </div>
+    <div class="layer-panel hide"></div>
+    <script type="module" src="./js/index.js"></script>
+  </body>
+</html>

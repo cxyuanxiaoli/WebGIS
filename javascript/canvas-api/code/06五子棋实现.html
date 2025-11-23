@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const text = document.createElement("div");
+      text.style.position = "absolute";
+      text.style.top = "20px";
+      text.style.left = "50px";
+      text.style.fontSize = "20px";
+      text.textContent = "请黑方点击棋盘落子";
+      document.body.appendChild(text);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 805;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#eee";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      //格网间距
+      let gridWidth = 45;
+      //格网起始坐标/终止坐标
+      let gridStartX = 20;
+      const gridEndX =
+        Math.floor((canvas.width - gridStartX) / gridWidth) * gridWidth +
+        gridStartX;
+
+      //绘制棋盘
+      for (let i = gridStartX; i <= gridEndX; i += gridWidth) {
+        ctx.beginPath();
+        ctx.moveTo(gridStartX, i);
+        ctx.lineTo(gridEndX, i);
+        ctx.moveTo(i, gridStartX);
+        ctx.lineTo(i, gridEndX);
+        ctx.stroke();
+      }
+
+      //存放棋子
+      /**
+       *@type {{x: number, y: number, player: string}[]}
+       */
+      const flags = [];
+      //当前是否黑棋
+      let currentIsBlack = true;
+
+      //画布点击事件
+      canvas.onclick = (e) => {
+        const { offsetX: x, offsetY: y } = e;
+        //判断点击位置是否在棋盘内
+        if (
+          x < gridStartX - gridWidth / 2 ||
+          x > gridEndX + gridWidth / 2 ||
+          y < gridStartX - gridWidth / 2 ||
+          y > gridEndX + gridWidth / 2
+        ) {
+          return;
+        }
+        //获取点击位置最近的棋盘格
+        const position = findShortPosition(x, y);
+        //判断是否已经有棋子存在
+        if (
+          flags.some((item) => item.x === position.x && item.y === position.y)
+        ) {
+          return;
+        }
+        flags.push(position);
+        //绘制棋子
+        drawChess(position);
+        //判断是否获胜
+        if (checkWin(position)) {
+          text.innerHTML = position.player + " 胜利!<br/>刷新页面重新开始";
+          canvas.onclick = null;
+        } else {
+          text.textContent = currentIsBlack ? "请黑方落子" : "请白方落子";
+        }
+      };
+
+      /**
+       * @param {number} x0
+       * @param {number} y0
+       * @returns {{x: number, y: number, player: string}}
+       */
+      function findShortPosition(x0, y0) {
+        const x =
+          Math.round((x0 - gridStartX) / gridWidth) * gridWidth + gridStartX;
+        const y =
+          Math.round((y0 - gridStartX) / gridWidth) * gridWidth + gridStartX;
+        return { x, y, player: "" };
+      }
+
+      /**
+       * @param {{x: number, y: number, player: string}} position
+       */
+      function drawChess(position) {
+        const player = currentIsBlack ? "black" : "white";
+        currentIsBlack = !currentIsBlack;
+        position.player = player;
+        const offset = gridWidth / 5.5;
+
+        if (player == "black") {
+          const gradient = ctx.createRadialGradient(
+            position.x - offset,
+            position.y - offset,
+            0,
+            position.x - offset,
+            position.y - offset,
+            (gridWidth / 9) * 5
+          );
+          gradient.addColorStop(0, "white");
+          gradient.addColorStop(1, "black");
+          ctx.fillStyle = gradient;
+        } else {
+          const gradient = ctx.createRadialGradient(
+            position.x + offset,
+            position.y + offset,
+            0,
+            position.x + offset,
+            position.y + offset,
+            (gridWidth / 9) * 4
+          );
+          gradient.addColorStop(0, "#ccc");
+          gradient.addColorStop(1, "white");
+          ctx.fillStyle = gradient;
+        }
+        ctx.beginPath();
+        ctx.arc(position.x, position.y, (gridWidth - 5) / 2, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+
+      /**
+       * @param {{x: number, y: number, player: string}} position
+       * @returns {boolean}
+       */
+      function checkWin(position) {
+        const directions = [
+          [0, 1],
+          [1, 1],
+          [1, 0],
+          [1, -1],
+        ];
+        for (let [dx, dy] of directions) {
+          let count = 1;
+          for (let i = 1; i < 5; i++) {
+            const x = position.x + dx * i * gridWidth;
+            const y = position.y + dy * i * gridWidth;
+            const flag = flags.find(
+              (item) =>
+                item.x === x && item.y === y && position.player === item.player
+            );
+            if (flag) {
+              count++;
+            } else {
+              break;
+            }
+          }
+          dx = -dx;
+          dy = -dy;
+
+          for (let i = 1; i < 5; i++) {
+            const x = position.x + dx * i * gridWidth;
+            const y = position.y + dy * i * gridWidth;
+            const flag = flags.find(
+              (item) =>
+                item.x === x && item.y === y && position.player === item.player
+            );
+            if (flag) {
+              count++;
+            } else {
+              break;
+            }
+          }
+          if (count >= 5) {
+            return true;
+          }
+        }
+        return false;
+      }
+    </script>
+  </body>
+</html>

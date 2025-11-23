@@ -1,0 +1,27 @@
+@primary-color: #3498db;
+@padding: 16px;
+
+.container {
+  background: lighten(@primary-color, 40%);
+  padding: @padding;
+  border-radius: 8px;
+
+  .title {
+    color: darken(@primary-color, 20%);
+    font-size: 1.5em;
+    margin-bottom: 8px;
+  }
+
+  .button {
+    background: @primary-color;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background: darken(@primary-color, 10%);
+    }
+  }
+}

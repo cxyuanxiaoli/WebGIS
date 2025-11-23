@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1000;
+      canvas.height = 400;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      //绘制折线
+      ctx.beginPath();
+      ctx.moveTo(100, 90);
+      ctx.lineTo(100, 200);
+      ctx.lineTo(200, 100);
+      ctx.lineTo(200, 210);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#a00";
+      ctx.stroke();
+
+      //绘制折线-线性渐变
+      ctx.beginPath();
+      ctx.moveTo(250, 90);
+      ctx.lineTo(250, 200);
+      ctx.lineTo(350, 100);
+      ctx.lineTo(350, 210);
+      const linearGradient = ctx.createLinearGradient(300, 90, 300, 210);
+      linearGradient.addColorStop(0, "#f00");
+      linearGradient.addColorStop(1, "#00f");
+      ctx.strokeStyle = linearGradient;
+      ctx.stroke();
+
+      //填充区域-径向渐变
+      const radialGradient = ctx.createRadialGradient(
+        450,
+        150,
+        0,
+        450,
+        150,
+        60
+      );
+      radialGradient.addColorStop(0, "red");
+      radialGradient.addColorStop(1, "green");
+      ctx.fillStyle = radialGradient;
+      ctx.fillRect(400, 100, 100, 100);
+
+      //填充区域-锥形渐变
+      const conicGradient = ctx.createConicGradient(
+        (135 / 180) * Math.PI,
+        600,
+        150
+      );
+      conicGradient.addColorStop(0, "pink");
+      conicGradient.addColorStop(0.5, "skyblue");
+      conicGradient.addColorStop(1, "pink");
+      ctx.fillStyle = conicGradient;
+      ctx.fillRect(550, 100, 100, 100);
+
+      //填充区域-CanvasPattern
+      const demo = document.createElement("canvas");
+      demo.width = 20;
+      demo.height = 20;
+      const demoCtx = demo.getContext("2d");
+      demoCtx.strokeStyle = "skyblue";
+      demoCtx.beginPath();
+      demoCtx.moveTo(10, 0);
+      demoCtx.lineTo(0, 10);
+      demoCtx.lineTo(6, 20);
+      demoCtx.lineTo(20, 10);
+      demoCtx.closePath();
+      demoCtx.stroke();
+      ctx.fillStyle = "gray";
+      ctx.fillRect(700, 100, 100, 100);
+      //CanvasImageSource(HTMLImageElement|SVGImageElement|HTMLVideoElement
+      //    |HTMLCanvasElement|ImageBitmap|OffscreenCanvas|VideoFrame)
+      ctx.fillStyle = ctx.createPattern(demo, "repeat");
+      ctx.fillRect(700, 100, 100, 100);
+
+      //绘制折线-调整折线端点/拐点的样式
+      ctx.lineCap = "round"; // butt（默认）、round、square
+      ctx.lineJoin = "bevel"; // round、bevel、miter（默认）
+      ctx.beginPath();
+      ctx.moveTo(100, 250);
+      ctx.lineTo(200, 350);
+      ctx.lineTo(300, 250);
+      ctx.lineTo(400, 350);
+      ctx.stroke();
+    </script>
+  </body>
+</html>

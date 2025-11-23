@@ -1,0 +1,24 @@
+.ol-control {
+  button {
+    background-color: #70acff;
+    color: #ffffff;
+    border: none;
+  }
+}
+
+.ol-zoom-extent {
+  top: 3.9em;
+}
+
+.ol-zoomslider {
+  top: 5.7em;
+}
+
+.ol-scale-line {
+  left: 170px;
+}
+.ol-mouse-position {
+  top: auto;
+  bottom: 8px;
+  color: #fff;
+}

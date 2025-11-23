@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <img id="img" src="./img/_.jpg" style="display: none" />
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 600;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+
+      let x = 0;
+      let y = 0;
+      let dx = 10;
+      let dy = 10;
+      let a = 0;
+      requestAnimationFrame(draw);
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (y + 100 >= canvas.height || y < 0) {
+          dy = -dy;
+        }
+        if (x + 100 >= canvas.width || x < 0) {
+          dx = -dx;
+        }
+        ctx.fillStyle = `rgb(${a++ % 255},0,0)`;
+        x += dx;
+        y += dy;
+        ctx.fillRect(x, y, 100, 100);
+        requestAnimationFrame(draw);
+      }
+    </script>
+  </body>
+</html>

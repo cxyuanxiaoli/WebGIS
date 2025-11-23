@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 300;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+
+      const path = new Path2D();
+      path.arc(100, 100, 80, 0, Math.PI * 2);
+      path.moveTo(200, 100);
+      path.lineTo(200, 200);
+      path.lineTo(300, 200);
+      path.closePath();
+      path.arc(400, 100, 80, 0, Math.PI * 2);
+      path.addPath(new Path2D("M10 10 h 80 v 80 h -80 Z"));
+      ctx.stroke(path);
+    </script>
+  </body>
+</html>

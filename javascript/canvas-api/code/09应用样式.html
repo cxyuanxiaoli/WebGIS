@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 600;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      for (let i = 0; i < 255; i += 2) {
+        for (let j = 0; j < 255; j += 2) {
+          ctx.fillStyle = `rgb(${i},${j},0)`;
+          ctx.fillRect(i, j, 2, 2);
+        }
+      }
+      for (let i = 0; i < 255; i += 16) {
+        for (let j = 0; j < 255; j += 16) {
+          ctx.fillStyle = `rgb(0,${i},${j})`;
+          ctx.beginPath();
+          ctx.arc(i + 300 + 8, j + 8, 7, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 255; i += 24) {
+        for (let j = 0; j < 255; j += 24) {
+          ctx.strokeStyle = `rgb(${i} 0 ${j})`;
+          ctx.beginPath();
+          ctx.arc(i + 600 + 12, j + 12, 8, 0, 2 * Math.PI);
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        }
+      }
+
+      //透明度
+      ctx.fillStyle = "#fd0";
+      ctx.fillRect(50, 300, 100, 100);
+      ctx.fillStyle = "#6c0";
+      ctx.fillRect(150, 300, 100, 100);
+      ctx.fillStyle = "#09f";
+      ctx.fillRect(50, 400, 100, 100);
+      ctx.fillStyle = "#f30";
+      ctx.fillRect(150, 400, 100, 100);
+      for (let i = 1; i < 10; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${0.1 * i})`;
+        ctx.beginPath();
+        ctx.arc(150, 400, 100 - i * 10, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = "#000";
+      ctx.beginPath();
+      ctx.lineWidth = 10;
+      ctx.moveTo(300, 300);
+      ctx.lineTo(500, 500);
+      ctx.lineTo(360, 300);
+      ctx.miterLimit = 10;
+      ctx.setLineDash([8, 4, 2, 4]);
+      ctx.lineDashOffset = 4;
+      console.log(ctx.getLineDash());
+
+      ctx.stroke();
+
+      const img = new Image();
+      img.src = "img/_.jpg";
+      img.onload = () => {
+        const pattern = ctx.createPattern(img, "repeat");
+        ctx.fillStyle = pattern;
+        ctx.fillRect(550, 300, 150, 150);
+      };
+
+      ctx.beginPath();
+      ctx.fillStyle = "black";
+      ctx.arc(800, 350, 30, 0, Math.PI * 2, false);
+      ctx.arc(800, 350, 15, 0, Math.PI * 2, true);
+      ctx.fill("nonzero");
+    </script>
+  </body>
+</html>

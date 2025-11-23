@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 300;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      ctx.moveTo(100, 100);
+      ctx.arcTo(200, 100, 250, 200, 100);
+      ctx.lineTo(250, 200);
+      ctx.stroke();
+      ctx.strokeRect(195, 95, 10, 10);
+      ctx.strokeRect(95, 95, 10, 10);
+      ctx.strokeRect(245, 195, 10, 10);
+
+      ctx.beginPath();
+      ctx.moveTo(500, 60);
+      ctx.bezierCurveTo(350, 20, 400, 200, 500, 250);
+      ctx.bezierCurveTo(600, 200, 650, 20, 500, 60);
+      const gradient = ctx.createConicGradient(-Math.PI / 2, 500, 155);
+      gradient.addColorStop(0, "#aa0");
+      gradient.addColorStop(0.5, "#0aa");
+      gradient.addColorStop(1, "#aa0");
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = "#666";
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+      ctx.shadowBlur = 5;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.rect(700, 60, 50, 50);
+      ctx.lineWidth = 5;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(700, 180);
+      ctx.lineTo(700, 230);
+      ctx.quadraticCurveTo(700, 250, 720, 250);
+      ctx.lineTo(770, 250);
+      ctx.quadraticCurveTo(790, 250, 790, 230);
+      ctx.lineTo(790, 180);
+      ctx.quadraticCurveTo(790, 160, 770, 160);
+      ctx.lineTo(720, 160);
+      ctx.quadraticCurveTo(700, 160, 700, 180);
+      ctx.stroke();
+    </script>
+  </body>
+</html>

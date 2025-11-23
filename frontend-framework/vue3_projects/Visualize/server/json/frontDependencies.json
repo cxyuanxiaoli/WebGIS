@@ -1,0 +1,681 @@
+{
+  "version": "0.0.0",
+  "name": "visualize",
+  "dependencies": {
+    "@kjgl77/datav-vue3": {
+      "version": "1.7.4",
+      "resolved": "https://registry.npmmirror.com/@kjgl77/datav-vue3/-/datav-vue3-1.7.4.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@jiaminghi/c-render": {
+          "version": "0.4.3",
+          "resolved": "https://registry.npmmirror.com/@jiaminghi/c-render/-/c-render-0.4.3.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@babel/runtime": {
+              "version": "7.28.3",
+              "resolved": "https://registry.npmmirror.com/@babel/runtime/-/runtime-7.28.3.tgz",
+              "overridden": false
+            },
+            "@jiaminghi/bezier-curve": {
+              "version": "0.0.9",
+              "resolved": "https://registry.npmmirror.com/@jiaminghi/bezier-curve/-/bezier-curve-0.0.9.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@babel/runtime": {
+                  "version": "7.28.3"
+                }
+              }
+            },
+            "@jiaminghi/color": {
+              "version": "0.1.1",
+              "resolved": "https://registry.npmmirror.com/@jiaminghi/color/-/color-0.1.1.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@babel/runtime": {
+                  "version": "7.28.3"
+                }
+              }
+            },
+            "@jiaminghi/transition": {
+              "version": "1.1.11",
+              "resolved": "https://registry.npmmirror.com/@jiaminghi/transition/-/transition-1.1.11.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@babel/runtime": {
+                  "version": "7.28.3"
+                }
+              }
+            }
+          }
+        },
+        "@jiaminghi/charts": {
+          "version": "0.2.18",
+          "resolved": "https://registry.npmmirror.com/@jiaminghi/charts/-/charts-0.2.18.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@babel/runtime": {
+              "version": "7.28.3"
+            },
+            "@jiaminghi/c-render": {
+              "version": "0.4.3"
+            }
+          }
+        },
+        "@jiaminghi/color": {
+          "version": "1.1.3",
+          "resolved": "https://registry.npmmirror.com/@jiaminghi/color/-/color-1.1.3.tgz",
+          "overridden": false
+        },
+        "@vueuse/core": {
+          "version": "10.11.1",
+          "resolved": "https://registry.npmmirror.com/@vueuse/core/-/core-10.11.1.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@types/web-bluetooth": {
+              "version": "0.0.20",
+              "resolved": "https://registry.npmmirror.com/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz",
+              "overridden": false
+            },
+            "@vueuse/metadata": {
+              "version": "10.11.1",
+              "resolved": "https://registry.npmmirror.com/@vueuse/metadata/-/metadata-10.11.1.tgz",
+              "overridden": false
+            },
+            "@vueuse/shared": {
+              "version": "10.11.1",
+              "resolved": "https://registry.npmmirror.com/@vueuse/shared/-/shared-10.11.1.tgz",
+              "overridden": false,
+              "dependencies": {
+                "vue-demi": {
+                  "version": "0.14.10",
+                  "resolved": "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.14.10.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@vue/composition-api": {},
+                    "vue": {
+                      "version": "3.5.20"
+                    }
+                  }
+                }
+              }
+            },
+            "vue-demi": {
+              "version": "0.14.10",
+              "resolved": "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.14.10.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@vue/composition-api": {},
+                "vue": {
+                  "version": "3.5.20"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "@vitejs/plugin-vue": {
+      "version": "5.2.4",
+      "resolved": "https://registry.npmmirror.com/@vitejs/plugin-vue/-/plugin-vue-5.2.4.tgz",
+      "overridden": false,
+      "dependencies": {
+        "vite": {
+          "version": "6.3.5"
+        },
+        "vue": {
+          "version": "3.5.20"
+        }
+      }
+    },
+    "axios": {
+      "version": "1.11.0",
+      "resolved": "https://registry.npmmirror.com/axios/-/axios-1.11.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "follow-redirects": {
+          "version": "1.15.11",
+          "resolved": "https://registry.npmmirror.com/follow-redirects/-/follow-redirects-1.15.11.tgz",
+          "overridden": false
+        },
+        "form-data": {
+          "version": "4.0.4",
+          "resolved": "https://registry.npmmirror.com/form-data/-/form-data-4.0.4.tgz",
+          "overridden": false,
+          "dependencies": {
+            "asynckit": {
+              "version": "0.4.0",
+              "resolved": "https://registry.npmmirror.com/asynckit/-/asynckit-0.4.0.tgz",
+              "overridden": false
+            },
+            "combined-stream": {
+              "version": "1.0.8",
+              "resolved": "https://registry.npmmirror.com/combined-stream/-/combined-stream-1.0.8.tgz",
+              "overridden": false,
+              "dependencies": {
+                "delayed-stream": {
+                  "version": "1.0.0",
+                  "resolved": "https://registry.npmmirror.com/delayed-stream/-/delayed-stream-1.0.0.tgz",
+                  "overridden": false
+                }
+              }
+            },
+            "es-set-tostringtag": {
+              "version": "2.1.0",
+              "resolved": "https://registry.npmmirror.com/es-set-tostringtag/-/es-set-tostringtag-2.1.0.tgz",
+              "overridden": false,
+              "dependencies": {
+                "es-errors": {
+                  "version": "1.3.0",
+                  "resolved": "https://registry.npmmirror.com/es-errors/-/es-errors-1.3.0.tgz",
+                  "overridden": false
+                },
+                "get-intrinsic": {
+                  "version": "1.3.0",
+                  "resolved": "https://registry.npmmirror.com/get-intrinsic/-/get-intrinsic-1.3.0.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "call-bind-apply-helpers": {
+                      "version": "1.0.2",
+                      "resolved": "https://registry.npmmirror.com/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "es-errors": {
+                          "version": "1.3.0"
+                        },
+                        "function-bind": {
+                          "version": "1.1.2"
+                        }
+                      }
+                    },
+                    "es-define-property": {
+                      "version": "1.0.1",
+                      "resolved": "https://registry.npmmirror.com/es-define-property/-/es-define-property-1.0.1.tgz",
+                      "overridden": false
+                    },
+                    "es-errors": {
+                      "version": "1.3.0"
+                    },
+                    "es-object-atoms": {
+                      "version": "1.1.1",
+                      "resolved": "https://registry.npmmirror.com/es-object-atoms/-/es-object-atoms-1.1.1.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "es-errors": {
+                          "version": "1.3.0"
+                        }
+                      }
+                    },
+                    "function-bind": {
+                      "version": "1.1.2"
+                    },
+                    "get-proto": {
+                      "version": "1.0.1",
+                      "resolved": "https://registry.npmmirror.com/get-proto/-/get-proto-1.0.1.tgz",
+                      "overridden": false,
+                      "dependencies": {
+                        "dunder-proto": {
+                          "version": "1.0.1",
+                          "resolved": "https://registry.npmmirror.com/dunder-proto/-/dunder-proto-1.0.1.tgz",
+                          "overridden": false,
+                          "dependencies": {
+                            "call-bind-apply-helpers": {
+                              "version": "1.0.2"
+                            },
+                            "es-errors": {
+                              "version": "1.3.0"
+                            },
+                            "gopd": {
+                              "version": "1.2.0"
+                            }
+                          }
+                        },
+                        "es-object-atoms": {
+                          "version": "1.1.1"
+                        }
+                      }
+                    },
+                    "gopd": {
+                      "version": "1.2.0",
+                      "resolved": "https://registry.npmmirror.com/gopd/-/gopd-1.2.0.tgz",
+                      "overridden": false
+                    },
+                    "has-symbols": {
+                      "version": "1.1.0",
+                      "resolved": "https://registry.npmmirror.com/has-symbols/-/has-symbols-1.1.0.tgz",
+                      "overridden": false
+                    },
+                    "hasown": {
+                      "version": "2.0.2"
+                    },
+                    "math-intrinsics": {
+                      "version": "1.1.0",
+                      "resolved": "https://registry.npmmirror.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
+                      "overridden": false
+                    }
+                  }
+                },
+                "has-tostringtag": {
+                  "version": "1.0.2",
+                  "resolved": "https://registry.npmmirror.com/has-tostringtag/-/has-tostringtag-1.0.2.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "has-symbols": {
+                      "version": "1.1.0"
+                    }
+                  }
+                },
+                "hasown": {
+                  "version": "2.0.2"
+                }
+              }
+            },
+            "hasown": {
+              "version": "2.0.2",
+              "resolved": "https://registry.npmmirror.com/hasown/-/hasown-2.0.2.tgz",
+              "overridden": false,
+              "dependencies": {
+                "function-bind": {
+                  "version": "1.1.2",
+                  "resolved": "https://registry.npmmirror.com/function-bind/-/function-bind-1.1.2.tgz",
+                  "overridden": false
+                }
+              }
+            },
+            "mime-types": {
+              "version": "2.1.35",
+              "resolved": "https://registry.npmmirror.com/mime-types/-/mime-types-2.1.35.tgz",
+              "overridden": false,
+              "dependencies": {
+                "mime-db": {
+                  "version": "1.52.0",
+                  "resolved": "https://registry.npmmirror.com/mime-db/-/mime-db-1.52.0.tgz",
+                  "overridden": false
+                }
+              }
+            }
+          }
+        },
+        "proxy-from-env": {
+          "version": "1.1.0",
+          "resolved": "https://registry.npmmirror.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "echarts": {
+      "version": "5.6.0",
+      "resolved": "https://registry.npmmirror.com/echarts/-/echarts-5.6.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "tslib": {
+          "version": "2.3.0",
+          "resolved": "https://registry.npmmirror.com/tslib/-/tslib-2.3.0.tgz",
+          "overridden": false
+        },
+        "zrender": {
+          "version": "5.6.1",
+          "resolved": "https://registry.npmmirror.com/zrender/-/zrender-5.6.1.tgz",
+          "overridden": false,
+          "dependencies": {
+            "tslib": {
+              "version": "2.3.0"
+            }
+          }
+        }
+      }
+    },
+    "normalize.css": {
+      "version": "8.0.1",
+      "resolved": "https://registry.npmmirror.com/normalize.css/-/normalize.css-8.0.1.tgz",
+      "overridden": false
+    },
+    "vite": {
+      "version": "6.3.5",
+      "resolved": "https://registry.npmmirror.com/vite/-/vite-6.3.5.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@types/node": {},
+        "esbuild": {
+          "version": "0.25.9",
+          "resolved": "https://registry.npmmirror.com/esbuild/-/esbuild-0.25.9.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@esbuild/aix-ppc64": {},
+            "@esbuild/android-arm": {},
+            "@esbuild/android-arm64": {},
+            "@esbuild/android-x64": {},
+            "@esbuild/darwin-arm64": {},
+            "@esbuild/darwin-x64": {},
+            "@esbuild/freebsd-arm64": {},
+            "@esbuild/freebsd-x64": {},
+            "@esbuild/linux-arm": {},
+            "@esbuild/linux-arm64": {},
+            "@esbuild/linux-ia32": {},
+            "@esbuild/linux-loong64": {},
+            "@esbuild/linux-mips64el": {},
+            "@esbuild/linux-ppc64": {},
+            "@esbuild/linux-riscv64": {},
+            "@esbuild/linux-s390x": {},
+            "@esbuild/linux-x64": {},
+            "@esbuild/netbsd-arm64": {},
+            "@esbuild/netbsd-x64": {},
+            "@esbuild/openbsd-arm64": {},
+            "@esbuild/openbsd-x64": {},
+            "@esbuild/openharmony-arm64": {},
+            "@esbuild/sunos-x64": {},
+            "@esbuild/win32-arm64": {},
+            "@esbuild/win32-ia32": {},
+            "@esbuild/win32-x64": {
+              "version": "0.25.9",
+              "resolved": "https://registry.npmmirror.com/@esbuild/win32-x64/-/win32-x64-0.25.9.tgz",
+              "overridden": false
+            }
+          }
+        },
+        "fdir": {
+          "version": "6.5.0",
+          "resolved": "https://registry.npmmirror.com/fdir/-/fdir-6.5.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "picomatch": {
+              "version": "4.0.3"
+            }
+          }
+        },
+        "fsevents": {},
+        "jiti": {},
+        "less": {},
+        "lightningcss": {},
+        "picomatch": {
+          "version": "4.0.3",
+          "resolved": "https://registry.npmmirror.com/picomatch/-/picomatch-4.0.3.tgz",
+          "overridden": false
+        },
+        "postcss": {
+          "version": "8.5.6",
+          "resolved": "https://registry.npmmirror.com/postcss/-/postcss-8.5.6.tgz",
+          "overridden": false,
+          "dependencies": {
+            "nanoid": {
+              "version": "3.3.11",
+              "resolved": "https://registry.npmmirror.com/nanoid/-/nanoid-3.3.11.tgz",
+              "overridden": false
+            },
+            "picocolors": {
+              "version": "1.1.1",
+              "resolved": "https://registry.npmmirror.com/picocolors/-/picocolors-1.1.1.tgz",
+              "overridden": false
+            },
+            "source-map-js": {
+              "version": "1.2.1",
+              "resolved": "https://registry.npmmirror.com/source-map-js/-/source-map-js-1.2.1.tgz",
+              "overridden": false
+            }
+          }
+        },
+        "rollup": {
+          "version": "4.49.0",
+          "resolved": "https://registry.npmmirror.com/rollup/-/rollup-4.49.0.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@rollup/rollup-android-arm-eabi": {},
+            "@rollup/rollup-android-arm64": {},
+            "@rollup/rollup-darwin-arm64": {},
+            "@rollup/rollup-darwin-x64": {},
+            "@rollup/rollup-freebsd-arm64": {},
+            "@rollup/rollup-freebsd-x64": {},
+            "@rollup/rollup-linux-arm-gnueabihf": {},
+            "@rollup/rollup-linux-arm-musleabihf": {},
+            "@rollup/rollup-linux-arm64-gnu": {},
+            "@rollup/rollup-linux-arm64-musl": {},
+            "@rollup/rollup-linux-loongarch64-gnu": {},
+            "@rollup/rollup-linux-ppc64-gnu": {},
+            "@rollup/rollup-linux-riscv64-gnu": {},
+            "@rollup/rollup-linux-riscv64-musl": {},
+            "@rollup/rollup-linux-s390x-gnu": {},
+            "@rollup/rollup-linux-x64-gnu": {},
+            "@rollup/rollup-linux-x64-musl": {},
+            "@rollup/rollup-win32-arm64-msvc": {},
+            "@rollup/rollup-win32-ia32-msvc": {},
+            "@rollup/rollup-win32-x64-msvc": {
+              "version": "4.49.0",
+              "resolved": "https://registry.npmmirror.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.49.0.tgz",
+              "overridden": false
+            },
+            "@types/estree": {
+              "version": "1.0.8",
+              "resolved": "https://registry.npmmirror.com/@types/estree/-/estree-1.0.8.tgz",
+              "overridden": false
+            },
+            "fsevents": {}
+          }
+        },
+        "sass-embedded": {},
+        "sass": {},
+        "stylus": {},
+        "sugarss": {},
+        "terser": {},
+        "tinyglobby": {
+          "version": "0.2.14",
+          "resolved": "https://registry.npmmirror.com/tinyglobby/-/tinyglobby-0.2.14.tgz",
+          "overridden": false,
+          "dependencies": {
+            "fdir": {
+              "version": "6.5.0"
+            },
+            "picomatch": {
+              "version": "4.0.3"
+            }
+          }
+        },
+        "tsx": {},
+        "yaml": {}
+      }
+    },
+    "vue-echarts": {
+      "version": "7.0.3",
+      "resolved": "https://registry.npmmirror.com/vue-echarts/-/vue-echarts-7.0.3.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@vue/runtime-core": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/runtime-core/-/runtime-core-3.5.20.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@vue/reactivity": {
+              "version": "3.5.20",
+              "resolved": "https://registry.npmmirror.com/@vue/reactivity/-/reactivity-3.5.20.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@vue/shared": {
+                  "version": "3.5.20"
+                }
+              }
+            },
+            "@vue/shared": {
+              "version": "3.5.20"
+            }
+          }
+        },
+        "echarts": {
+          "version": "5.6.0"
+        },
+        "vue-demi": {
+          "version": "0.13.11",
+          "resolved": "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.13.11.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@vue/composition-api": {},
+            "vue": {
+              "version": "3.5.20"
+            }
+          }
+        },
+        "vue": {
+          "version": "3.5.20"
+        }
+      }
+    },
+    "vue": {
+      "version": "3.5.20",
+      "resolved": "https://registry.npmmirror.com/vue/-/vue-3.5.20.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@vue/compiler-dom": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/compiler-dom/-/compiler-dom-3.5.20.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@vue/compiler-core": {
+              "version": "3.5.20",
+              "resolved": "https://registry.npmmirror.com/@vue/compiler-core/-/compiler-core-3.5.20.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@babel/parser": {
+                  "version": "7.28.3"
+                },
+                "@vue/shared": {
+                  "version": "3.5.20"
+                },
+                "entities": {
+                  "version": "4.5.0",
+                  "resolved": "https://registry.npmmirror.com/entities/-/entities-4.5.0.tgz",
+                  "overridden": false
+                },
+                "estree-walker": {
+                  "version": "2.0.2"
+                },
+                "source-map-js": {
+                  "version": "1.2.1"
+                }
+              }
+            },
+            "@vue/shared": {
+              "version": "3.5.20"
+            }
+          }
+        },
+        "@vue/compiler-sfc": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/compiler-sfc/-/compiler-sfc-3.5.20.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@babel/parser": {
+              "version": "7.28.3",
+              "resolved": "https://registry.npmmirror.com/@babel/parser/-/parser-7.28.3.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@babel/types": {
+                  "version": "7.28.2",
+                  "resolved": "https://registry.npmmirror.com/@babel/types/-/types-7.28.2.tgz",
+                  "overridden": false,
+                  "dependencies": {
+                    "@babel/helper-string-parser": {
+                      "version": "7.27.1",
+                      "resolved": "https://registry.npmmirror.com/@babel/helper-string-parser/-/helper-string-parser-7.27.1.tgz",
+                      "overridden": false
+                    },
+                    "@babel/helper-validator-identifier": {
+                      "version": "7.27.1",
+                      "resolved": "https://registry.npmmirror.com/@babel/helper-validator-identifier/-/helper-validator-identifier-7.27.1.tgz",
+                      "overridden": false
+                    }
+                  }
+                }
+              }
+            },
+            "@vue/compiler-core": {
+              "version": "3.5.20"
+            },
+            "@vue/compiler-dom": {
+              "version": "3.5.20"
+            },
+            "@vue/compiler-ssr": {
+              "version": "3.5.20",
+              "resolved": "https://registry.npmmirror.com/@vue/compiler-ssr/-/compiler-ssr-3.5.20.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@vue/compiler-dom": {
+                  "version": "3.5.20"
+                },
+                "@vue/shared": {
+                  "version": "3.5.20"
+                }
+              }
+            },
+            "@vue/shared": {
+              "version": "3.5.20"
+            },
+            "estree-walker": {
+              "version": "2.0.2",
+              "resolved": "https://registry.npmmirror.com/estree-walker/-/estree-walker-2.0.2.tgz",
+              "overridden": false
+            },
+            "magic-string": {
+              "version": "0.30.18",
+              "resolved": "https://registry.npmmirror.com/magic-string/-/magic-string-0.30.18.tgz",
+              "overridden": false,
+              "dependencies": {
+                "@jridgewell/sourcemap-codec": {
+                  "version": "1.5.5",
+                  "resolved": "https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz",
+                  "overridden": false
+                }
+              }
+            },
+            "postcss": {
+              "version": "8.5.6"
+            },
+            "source-map-js": {
+              "version": "1.2.1"
+            }
+          }
+        },
+        "@vue/runtime-dom": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/runtime-dom/-/runtime-dom-3.5.20.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@vue/reactivity": {
+              "version": "3.5.20"
+            },
+            "@vue/runtime-core": {
+              "version": "3.5.20"
+            },
+            "@vue/shared": {
+              "version": "3.5.20"
+            },
+            "csstype": {
+              "version": "3.1.3",
+              "resolved": "https://registry.npmmirror.com/csstype/-/csstype-3.1.3.tgz",
+              "overridden": false
+            }
+          }
+        },
+        "@vue/server-renderer": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/server-renderer/-/server-renderer-3.5.20.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@vue/compiler-ssr": {
+              "version": "3.5.20"
+            },
+            "@vue/shared": {
+              "version": "3.5.20"
+            },
+            "vue": {
+              "version": "3.5.20"
+            }
+          }
+        },
+        "@vue/shared": {
+          "version": "3.5.20",
+          "resolved": "https://registry.npmmirror.com/@vue/shared/-/shared-3.5.20.tgz",
+          "overridden": false
+        },
+        "typescript": {}
+      }
+    }
+  }
+}

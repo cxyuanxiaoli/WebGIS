@@ -1,0 +1,15 @@
+/* * {
+  margin: 0;
+} */
+
+.title {
+  font-size: 60px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: 2px 2px 2px #ff8a8a;
+  color: deepskyblue;
+}
+img {
+  width: 50px;
+}
