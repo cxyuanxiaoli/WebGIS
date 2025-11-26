@@ -90,3 +90,10 @@ class B extends A {}
 const bObj = new B();
 console.log(bObj instanceof A);
 console.log(bObj);
+
+const sym1 = Symbol("a");
+const sym2 = Symbol("a");
+console.log(sym1);
+console.log(Symbol.iterator);
+
+console.log(sym1 === sym2);
