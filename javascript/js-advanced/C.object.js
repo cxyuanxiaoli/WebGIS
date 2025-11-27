@@ -144,3 +144,39 @@ console.log(b1, b2);
 console.log(b1.getName());
 
 const aaa = Object.create(null);
+console.log("-----------------");
+
+const objA = {
+  foo: function () {
+    /* code */
+  },
+  bar: function* () {
+    let index = 0;
+    while (true) yield index++;
+  },
+  f: async function () {
+    await "some_promise";
+  },
+  ["foo" + 2]: function () {
+    console.log("foo2");
+  },
+};
+
+const objB = {
+  foo() {
+    /* code */
+  },
+  *bar() {
+    let index = 0;
+    while (true) yield index++;
+  },
+  async f() {
+    await "some_promise";
+  },
+  ["foo" + 2]() {
+    console.log("foo2");
+  },
+};
+
+objA.foo2();
+objB.foo2();

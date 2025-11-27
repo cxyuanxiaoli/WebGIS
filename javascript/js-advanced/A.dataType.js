@@ -97,3 +97,8 @@ console.log(sym1);
 console.log(Symbol.iterator);
 
 console.log(sym1 === sym2);
+console.log("-----------------");
+
+const arr4 = [1, 2, 3];
+console.log(arr4["1"]);
+console.log(arr4[1]);
