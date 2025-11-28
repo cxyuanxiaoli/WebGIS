@@ -1,3 +1,4 @@
+"use strict";
 const obj1 = {
   a: 1,
   b: {
@@ -180,3 +181,211 @@ const objB = {
 
 objA.foo2();
 objB.foo2();
+console.log("------------------");
+
+const myObj1 = {};
+Object.defineProperty(myObj1, "name", {
+  value: "John",
+  writable: false, //是否可写
+  enumerable: true, //是否可枚举
+  configurable: true, //是否可配置
+});
+// myObj1.name = "Alice";
+// console.log(myObj1);
+Object.defineProperty(myObj1, "name", {
+  writable: true,
+  configurable: false,
+});
+myObj1.name = "Alice";
+console.log(myObj1);
+Object.defineProperty(myObj1, "name", {
+  writable: false,
+});
+console.log(myObj1);
+// myObj1.name = "Bob";
+
+myObj1.age = 20;
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+Object.defineProperty(myObj1, "age", {
+  writable: false,
+});
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+Object.defineProperty(myObj1, "age", {
+  get() {
+    return 20;
+  },
+});
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+console.log("------------------------");
+
+console.log(myObj1.hasOwnProperty("name"));
+console.log(myObj1.propertyIsEnumerable("name"));
+console.log(Object.hasOwn(myObj1, "name"));
+console.log("name" in myObj1);
+
+const sym = Symbol("id");
+Object.defineProperty(myObj1, sym, {
+  value: 1,
+  enumerable: false,
+});
+console.log(myObj1.propertyIsEnumerable(sym));
+console.log(sym in myObj1);
+
+for (let key in myObj1) {
+  console.log(key + ":" + myObj1[key]);
+}
+
+const SimplePropertyRetriever = {
+  getOwnEnumerables(obj) {
+    return this._getPropertyNames(obj, true, false, this._enumerable);
+    // 或使用 for...in 和 Object.hasOwn 过滤，或者：return Object.keys(obj);
+  },
+  getOwnNonenumerables(obj) {
+    return this._getPropertyNames(obj, true, false, this._notEnumerable);
+  },
+  getOwnEnumerablesAndNonenumerables(obj) {
+    return this._getPropertyNames(
+      obj,
+      true,
+      false,
+      this._enumerableAndNotEnumerable
+    );
+    // 或者仅使用：return Object.getOwnPropertyNames(obj);
+  },
+  getPrototypeEnumerables(obj) {
+    return this._getPropertyNames(obj, false, true, this._enumerable);
+  },
+  getPrototypeNonenumerables(obj) {
+    return this._getPropertyNames(obj, false, true, this._notEnumerable);
+  },
+  getPrototypeEnumerablesAndNonenumerables(obj) {
+    return this._getPropertyNames(
+      obj,
+      false,
+      true,
+      this._enumerableAndNotEnumerable
+    );
+  },
+  getOwnAndPrototypeEnumerables(obj) {
+    return this._getPropertyNames(obj, true, true, this._enumerable);
+    // 或者使用未过滤的 for...in
+  },
+  getOwnAndPrototypeNonenumerables(obj) {
+    return this._getPropertyNames(obj, true, true, this._notEnumerable);
+  },
+  getOwnAndPrototypeEnumerablesAndNonenumerables(obj) {
+    return this._getPropertyNames(
+      obj,
+      true,
+      true,
+      this._enumerableAndNotEnumerable
+    );
+  },
+  // 私有的静态属性检查器回调
+  _enumerable(obj, prop) {
+    return Object.prototype.propertyIsEnumerable.call(obj, prop);
+  },
+  _notEnumerable(obj, prop) {
+    return !Object.prototype.propertyIsEnumerable.call(obj, prop);
+  },
+  _enumerableAndNotEnumerable(obj, prop) {
+    return true;
+  },
+  // 受到 http://stackoverflow.com/a/8024294/271577 的启发
+  _getPropertyNames(obj, iterateSelf, iteratePrototype, shouldInclude) {
+    const props = [];
+    do {
+      if (iterateSelf) {
+        Object.getOwnPropertyNames(obj).forEach((prop) => {
+          if (props.indexOf(prop) === -1 && shouldInclude(obj, prop)) {
+            props.push(prop);
+          }
+        });
+      }
+      if (!iteratePrototype) {
+        break;
+      }
+      iterateSelf = true;
+      obj = Object.getPrototypeOf(obj);
+    } while (obj);
+    return props;
+  },
+};
+
+SimplePropertyRetriever.getOwnAndPrototypeEnumerablesAndNonenumerables(
+  myObj1
+).forEach((value, prop) => {
+  console.log(prop + ":" + value);
+});
+console.log("-------------------");
+
+const myObj2 = {
+  a: 1,
+  e: 5,
+  [Symbol("c")]: 3,
+};
+
+console.log(Object.getPrototypeOf(myObj2) === Object.prototype);
+Object.defineProperties(myObj2, {
+  b: {
+    value: 2,
+    enumerable: false,
+  },
+  [Symbol("d")]: {
+    value: 4,
+    enumerable: false,
+  },
+});
+console.log(myObj2);
+
+console.log(Object.keys(myObj2));
+console.log(Object.values(myObj2));
+console.log(Object.entries(myObj2));
+
+console.log("names", Object.getOwnPropertyNames(myObj2));
+console.log("symbols", Object.getOwnPropertySymbols(myObj2));
+console.log("symbols", Object.getOwnPropertyDescriptors(myObj2));
+console.log(Reflect.ownKeys(myObj2));
+
+const kvs = [];
+for (let key in myObj2) {
+  kvs.push([key, myObj2[key]]);
+}
+console.log(kvs);
+
+const myObj3 = Object.assign({}, myObj2);
+console.log(Object.getOwnPropertyDescriptors(myObj3));
+
+console.log({ ...myObj2 });
+console.log("--------------------");
+
+const obj5 = {};
+console.log(obj5);
+console.log(obj5 + "");
+console.log(obj5.toString()); // 默认情况下，与toString相同，返回"[object Object]"
+
+const date = new Date();
+console.log(date.toLocaleString()); // 根据本地时间格式返回，如"2021/12/29 上午10:30:00"
+
+const number = 123456.789;
+console.log(number.toLocaleString()); // 根据本地数字格式，如"123,456.789"（英语环境）或"123.456,789"（一些欧洲地区）
+
+const array = [123456.789, new Date()];
+console.log(array.toLocaleString()); // 数组的每个元素调用toLocaleString，然后用逗号连接。例如："123,456.789,2021/12/29 上午10:30:00"
+console.log("----------------------");
+
+const obj6 = {
+  get prop() {
+    return this._prop;
+  },
+  set prop(value) {
+    this._prop = value;
+  },
+};
+console.log(obj6);
+obj6.prop = 123;
+console.log(obj6.prop);
+console.log(obj6);
+
+delete obj6.prop;
+console.log(obj6);

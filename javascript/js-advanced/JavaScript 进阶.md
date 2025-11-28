@@ -22,29 +22,189 @@ ECMAScript标准定义了8种数据类型：
 
 `for...in` 语句循环一个指定的变量来循环一个对象所有可枚举的属性。
 
-
-
 ### for ... of
 
 `for...of` 语句在可迭代对象（包括`Array`、`Map`、`Set`、`arguments` 等等）上创建了一个循环，对值的每一个独特属性调用一次迭代。
+
+## 函数
 
 
 
 ## 对象
 
-### 枚举对象的属性
-
-* for ... in 循环，该方法依次访问一个对象及其原型链中所有可枚举的属性
-* Object.keys(o) 该方法返回对象`o`自身包含（不包括原型中）的所有可枚举属性的名称的数组
-* Object.getOwnPropertyNames(o) 该方法返回对象`o`自身包含（不包括原型中）的所有属性（无论是否可枚举）的名称的数组
-
-
-
 ### 创建对象
+
+通常通过以下三种方式创建一个新对象：
 
 1. 对象字面量
 2. 构造函数
 3. Object.create  该方法允许为创建的对象选择一个原型对象，而不用定义构造函数
+
+### 属性
+
+在 JavaScript 中，对象可以被看作是一个属性的集合。对象属性等价于键值对。属性键要么是`字符串`，要么是 `symbol`。当其他类型（如数字）用于索引对象时，值会隐式地转化为字符串
+
+有两种类型的对象属性：*数据*属性和*访问器*属性。每个属性都有对应的*特性*
+
+#### 数据属性
+
+数据属性将键与值相关联。它可以由以下特性描述：
+
+* value(undefined) 
+* writable(false)  表示属性是否可以通过赋值进行修改
+* enumerable(false)  表示属性是否可以通过 `for...in` 循环进行枚举
+* configurable(false)  表示属性是否可以删除，是否可以更改为访问器属性，以及是否可以更改其特性
+
+#### 访问器属性
+
+将键与两个访问器函数（`get` 和 `set`）相关联，以获取或者存储值，访问器属性有以下特性：
+
+* get(undefined)  
+* set(undefined)
+* enumerable(false) 
+* configurable(false)
+
+#### Object.defineProperty()
+
+**`Object.defineProperty()`** 静态方法会直接在一个对象上定义一个新属性，或修改其现有属性
+
+语法：`Object.defineProperty(obj, prop, descriptor)`
+
+* obj  要定义属性的对象
+* prop  一个字符串或 `Symbol`，指定了要定义或修改的属性键
+* descriptor  要定义或修改的属性的描述符
+
+属性描述符有两种主要类型：数据描述符和访问器描述符，描述符属性同`数据/访问器属性`的特性
+
+`Object.defineProperty()` 允许精确地添加或修改对象上的属性。通过赋值添加的普通属性会在枚举属性时（例如 `for...in`、`Object.keys()`等）出现，它们的值可以被更改或删除。默认情况下，使用 `Object.defineProperty()` 添加的属性是不可写、不可枚举和不可配置的。此外，`Object.defineProperty()` 使用内部方法实现，即使属性已存在也不会调用setter
+
+```js
+const o = {};
+o.a = 1;
+// 等价于：
+Object.defineProperty(o, "a", {
+  value: 1,
+  writable: true,
+  configurable: true,
+  enumerable: true,
+});
+
+// 另一种情况
+Object.defineProperty(o, "a", { value: 1 });
+// 等价于：
+Object.defineProperty(o, "a", {
+  value: 1,
+  writable: false,
+  configurable: false,
+  enumerable: false,
+});
+```
+
+如果旧描述符的 `configurable` 特性被设置为 `false`，则该属性被称为*不可配置的*。无法更改不可配置的访问器属性的任何特性，也不能将其在数据类型和访问器类型之间切换。对于具有 `writable: true` 的数据属性，可以进行`writable` 特性从 `true` 改为 `false`的单向修改
+
+当当前属性是可配置的时，如果新描述符中缺少一个特性，则会保留旧描述符该特性的值
+
+通过提供不同类型的描述符，可以在数据属性和访问器属性之间切换
+
+```js
+myObj1={}
+myObj1.age = 20;
+//{ value: 20, writable: true, enumerable: true, configurable: true }
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+Object.defineProperty(myObj1, "age", {
+  writable: false,
+});
+//{ value: 20, writable: false, enumerable: true, configurable: true }
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+Object.defineProperty(myObj1, "age", {
+  get() {
+    return 20;
+  },
+});
+//{ get: [Function: get], set: undefined, enumerable: true, configurable: true }
+console.log(Object.getOwnPropertyDescriptor(myObj1, "age"));
+```
+
+#### Object.getOwnPropertyDescriptor()
+
+**`Object.getOwnPropertyDescriptor()`** 静态方法返回一个对象，该对象描述给定对象上特定属性（即直接存在于对象上而不在对象的原型链中的属性）的配置。返回的对象是可变的，但对其进行更改不会影响原始属性的配置
+
+语法：`Object.getOwnPropertyDescriptor(obj, prop)`
+
+* obj  要查找其属性的对象
+* prop  要检索其描述的属性的名称或Symbol
+
+#### 属性的可枚举性和所有权
+
+JavaScript 对象中的每个属性能根据三个因素进行分类：
+
+- 可枚举或不可枚举
+- 字符串或 symbol
+- 自有属性或从原型链继承的属性
+
+大多数迭代方法（如：`for...in`循环和 `Object.keys`）仅访问可枚举的键
+
+属性的所有权取决于属性是否直接属于该对象，而不是对象的原型链
+
+所有的属性，不论是可枚举或不可枚举、是字符串或 symbol、是自有的或继承的，都能用`点记号表示法或方括号表示法`进行访问
+
+### 查询对象属性
+
+四种内置的查询对象属性的方法。它们全部都支持字符串和 symbol 键
+
+| 方法 | 可枚举的、自有的 | 可枚举的、继承的 | 不可枚举的、自有的 | 不可枚举的、继承的 |
+|:-----|:----------------:|:----------------:|:------------------:|:------------------:|
+| obj.propertyIsEnumerable() | true ✅ | false ❌ | false ❌ | false ❌ |
+| obj.hasOwnProperty() | true ✅ | false ❌ | true ✅ | false ❌ |
+| Object.hasOwn() | true ✅ | false ❌ | true ✅ | false ❌ |
+| in 操作符 | true ✅ | true ✅ | true ✅ | true ✅ |
+
+### 枚举对象的属性
+
+JavaScript 中有许多遍历对象属性的方法
+
+| 方法                                           | 可枚举、自有的 | 可枚举、继承的 | 不可枚举、自有的 | 不可枚举、继承的 |
+| ---------------------------------------------- | :------------: | :------------: | :--------------: | :--------------: |
+| Object.keys<br>Object.values<br>Object.entries | ✅<br>(字符串)  |       ❌        |        ❌         |        ❌         |
+| Object.getOwnPropertyNames                     | ✅<br>(字符串)  |       ❌        |  ✅<br>(字符串)   |        ❌         |
+| Object.getOwnPropertySymbols                   | ✅<br>(symbol)  |       ❌        |  ✅<br>(symbol)   |        ❌         |
+| Object.getOwnPropertyDescriptors               |       ✅        |       ❌        |        ✅         |        ❌         |
+| Reflect.ownKeys                                |       ✅        |       ❌        |        ✅         |        ❌         |
+| for...in                                       | ✅<br>(字符串)  | ✅<br/>(字符串) |        ❌         |        ❌         |
+| Object.assign<br>(第一个参数之后)              |       ✅        |       ❌        |        ❌         |        ❌         |
+| ( ... ) 对象展开                               |       ✅        |       ❌        |        ❌         |        ❌         |
+
+### getter and setter
+
+`getter`和`setter`将对象属性绑定到`查询/设置`该属性时要调用的函数
+
+```js
+const obj = {
+  get prop(){ },
+  set prop(value){ }
+}
+```
+
+使用 `delete` 操作符删除 getter/setter
+
+```js
+delete obj.prop;
+```
+
+使用`defineProperty`在现有对象上定义 getter/setter
+
+```js
+var o = { a: 0 };
+Object.defineProperty(o, "b", {
+  get: function () {
+    return this.a + 1;
+  },
+});
+
+console.log(o.b);
+```
+
+相对于普通属性，getter/setter 具有懒加载、数据访问可控制等优势
 
 ### 定义方法
 
@@ -73,8 +233,6 @@ const objB = {
   ["foo"+2]() { }   //计算属性名
 };
 ```
-
-
 
 ## 继承与原型链
 
@@ -323,6 +481,8 @@ console.log(red.red); // 0
 ```
 
 这就像是对象有了一个 `red` 属性——但实际上，实例上并没有这样的属性！实例只有两个方法，分别以 `get` 和 `set` 为前缀，而这使得我们可以像操作属性一样操作它们
+
+当使用 `get` 关键字时，属性将被定义在实例的原型上，当使用`Object.defineProperty()`时，属性将被定义在实例自身上
 
 ### 公共字段
 

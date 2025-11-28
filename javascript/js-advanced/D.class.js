@@ -103,3 +103,30 @@ Object.getPrototypeOf(B.prototype).say();
 const arr = [new A(), new B(), new C()];
 
 arr.forEach((item) => item.say());
+
+class Person {
+  #id;
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  get id() {
+    console.log(this);
+    return this.#id;
+  }
+  set id(value) {
+    console.log("set id--");
+    this.#id = value;
+  }
+}
+class Student extends Person {
+  constructor(name, age) {
+    super(name, age);
+  }
+}
+const s1 = new Student("Alice", 20);
+const s2 = new Student("Bob", 21);
+s1.id = 101;
+console.log(s1.id);
+
+console.log(s2.id);
