@@ -14,6 +14,10 @@ ECMAScript标准定义了8种数据类型：
   * Symbol
 * 引用数据类型 Object
 
+## 运算符
+
+### 解构
+
 
 
 ## 循环和迭代
@@ -28,7 +32,126 @@ ECMAScript标准定义了8种数据类型：
 
 ## 函数
 
+### length
 
+`Function` 实例的 **`length`** 数据属性表示函数期望的参数数量
+
+这个数字不包括 剩余参数，只包括在第一个具有默认值的参数之前的参数
+
+```js
+function fn1(x, y, z = 10) {}
+function fn2(x = 1, y, z) {}
+function fn3(...args) {}
+console.log(fn1.length);   // 2
+console.log(fn2.length);   // 0
+console.log(fn3.length);   // 0
+```
+
+### 默认参数值
+
+**函数默认参数**允许在没有值或 `undefined` 被传入时使用默认形参
+
+```js
+function test(num = 1) {
+  console.log(typeof num);
+}
+test(); // 'number'
+test(undefined); // 'number'
+
+test(""); // 'string'
+test(null); // 'object'
+```
+
+前面的参数可用于以后的默认参数
+
+```js
+function greet(name, greeting = "Hello", message = greeting + " " + name) {
+  return [name, greeting, message];
+}
+console.log(greet("David")); // [ 'David', 'Hello', 'Hello David' ] 
+console.log(greet("David", "Hi"));   // [ 'David', 'Hi', 'Hi David' ]
+```
+
+函数传参时始终以从左到右的顺序进行，无论该参数是否具有默认值
+
+```js
+function f(x = 1, y) {
+  return [x, y];
+}
+f()  // [1, undefined]
+f(2) // [2, undefined]
+```
+
+### 剩余参数与 arguments 对象
+
+**剩余参数**语法允许函数将任意数量的参数作为数组接收，从而在 JavaScript 中实现了`可变参数函数`的表示方式
+
+剩余参数的语法限制：
+
+- 一个函数定义只能包含一个剩余参数
+- 剩余参数必须是函数定义的最后一个参数
+- 剩余参数之后不允许出现 尾后逗号
+- 剩余参数不能有 默认值
+
+```js
+function fn(x, y, ...others) {
+  console.log(x, y, others);
+}
+fn(1, 2, 3, 4, 5);  // 1 2 [ 3, 4, 5 ]
+```
+
+剩余参数始终为数组对象，即使只传入单个值或undefined
+
+```js
+function myFun(a, b, ...manyMoreArgs) {
+  console.log(a, b, manyMoreArgs);
+}
+myFun("one");   // "one" undefined []
+```
+
+
+
+**`arguments`** 是一个类数组对象，是所有非箭头函数中都可用的局部变量，其中包含传递给该函数的参数值
+
+`arguments` 是一个类数组对象，这意味着它具有 `length` 属性，且属性索引从零开始，但它不具备 `Array` 的内置方法，例如 `forEach()` 或 `map()`。不过，可通过以下方式将其转换为真正的 `Array`：使用 `slice()`、`Array.from()` 或`展开语法`
+
+```js
+function fn() {
+  console.log(arguments, arguments.length);
+}
+fn(1, "a", true);  // [Arguments] { '0': 1, '1': 'a', '2': true } 3
+```
+
+在具有复杂参数（剩余参数、默认值、解构）的非严格函数中，`arguments` 对象始终反映函数调用时传递的值
+
+在严格模式下，无论传递的参数类型如何，在函数体内为参数赋新值永远不会影响 `arguments` 对象，同样地，为 `arguments` 索引赋新值也不会改变参数的值
+
+
+
+现代代码优先推荐使用`剩余参数`语法
+
+### 箭头函数
+
+**箭头函数表达式**的语法比传统的函数表达式更简洁，但在语义上有一些差异，在用法上也有一些限制：
+
+- 箭头函数没有独立的 `this`、`arguments` 和 `super` 绑定，并且不可被用作方法
+- 箭头函数不能用作构造函数，使用 `new` 调用它们会引发 `TypeError`。它们也无法访问 `new.target` 关键字。
+- 箭头函数不能在其主体中使用 `yield`，也不能作为生成器函数创建
+
+```js
+const fn1 = (a, b) => {
+  return a + b;
+};
+const fn2 = (a, b) => a + b;
+
+const fn3 = (name, age) => {
+  return {
+    name,
+    age,
+  };
+};
+const fn4 = (name, age) => ({ name, age });   // 直接返回一个对象
+```
 
 ## 对象
 
@@ -550,6 +673,8 @@ class B extends A {
 在派生类内，可以使用 `super` 访问父类的方法。这允许在避免代码重复的情况下增强父类的方法
 
 派生类无权访问父类的私有字段
+
+## 模块
 
 
 

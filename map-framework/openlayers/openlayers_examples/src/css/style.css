@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+}
+
+.list {
+  width: 20%;
+  height: 100%;
+  background-color: #efd6d6;
+}
+#app {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#map {
+  width: 80%;
+  height: 80%;
+  /* background-color: #9c6262; */
+}
