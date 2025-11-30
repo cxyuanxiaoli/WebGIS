@@ -12,6 +12,20 @@ body {
   width: 20%;
   height: 100%;
   background-color: #efd6d6;
+  padding: 20px;
+  box-sizing: border-box;
+
+  ul {
+    margin-left: 20px;
+    li {
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    li:hover {
+      color: #e74a4a;
+      transform: translateX(2px);
+    }
+  }
 }
 #app {
   width: 80%;
@@ -23,5 +37,6 @@ body {
 #map {
   width: 80%;
   height: 80%;
+  box-shadow: 0 0 10px #888888;
   /* background-color: #9c6262; */
 }

@@ -18,7 +18,78 @@ ECMAScript标准定义了8种数据类型：
 
 ### 解构
 
+**解构**语法可以将数组中的值或对象的属性取出，赋值给其他变量
 
+```js
+const arr = [1, 2, 3];
+const [a, b, c] = arr;
+console.log(a, b, c);   // 1 2 3
+
+const obj = { prop1: 10, prop2: 20, prop3: 30 };
+const { prop1: x, prop2: y, prop3: z } = obj;
+console.log(x, y, z);   // 10 20 30  等同于：const x = obj.prop1, y = obj.prop2, z = obj.prop3;
+```
+
+对于对象和数组的解构，有两种解构模式：*绑定模式*和*赋值模式*，语法略有不同
+
+* 绑定模式中，模式以声明关键字（`let` 或 `const`）开始，每个单独的属性必须绑定到一个变量或进一步解构
+
+  ```js
+  const colors = ["red", "green", "blue"];
+  const [red, green, blue] = colors;
+  const obj = { a: 1, b: { c: 2 } };
+  const {
+    a: valA,
+    b: { c: valC },
+  } = obj;
+  ```
+
+* 赋值模式中，模式不以关键字开头。每个解构属性都被赋值给一个赋值目标——这个赋值目标可以事先声明
+
+  ```js
+  const colors = ["red", "green", "blue"];
+  let red2, green2, blue2;
+  [red2, green2, blue2] = colors;
+  const obj = { a: 1, b: { c: 2 } };
+  let valAA, valCC;
+  ({                        // 这种情况下，在赋值语句周围必须添加括号
+    a: valAA,
+    b: { c: valCC }, 
+  } = obj);                 // 且编码风格不包括尾随分号时，在 ( ... ) 表达式前面需要有一个分号
+  ```
+
+解构对象时，当对象属性名与定义变量名一致时，可简写
+
+```js
+const myObj = { name: "John", age: 30, city: "New York" };
+const { name, age, city } = myObj;
+// 等同于  const { name: name, age: age, city: city } = myObj;
+```
+
+#### 默认值
+
+每个解构属性都可以有一个*默认值*。当属性不存在或值为 `undefined` 时，将使用默认值
+
+```js
+const [elem1 = 1] = [];
+console.log(elem1);   // 1
+const { b: prop1 = 2, c: prop2 = 3 } = { b: undefined };
+console.log(prop1, prop2);   // 2 3
+```
+
+#### 剩余元素与剩余属性
+
+你可以使用剩余属性（`...rest`）结束解构模式。对数组解构时，此模式会将数组的剩余元素存储到新的名为 `rest`的数组中。对对象解构时，此模式会将对象剩余的可枚举属性存储到新的名为 `rest` 的对象中
+
+```js
+const arr2 = [1, 2, 3, 4, 5];
+const [first, second, ...otherElem] = arr2;
+console.log(first, second, otherElem); // 1 2 [3,4,5]
+
+const obj3 = { p: 42, q: true, r: "hello" };
+const { p, ...otherProps } = obj3;
+console.log(p, otherProps); // 42 { q: true, r: "hello" }
+```
 
 ## 循环和迭代
 
@@ -675,6 +746,75 @@ class B extends A {
 派生类无权访问父类的私有字段
 
 ## 模块
+
+### **export**
+
+**`export`** 声明用于从 JavaScript 模块中导出值
+
+有两种不同的导出方式，具名导出和默认导出
+
+```js
+// ModuleA.js
+export const num = 1;    // 具名导出
+const arr = [];
+const obj = {};
+export { arr, obj };     // 具名导出
+
+export default "default";   // 默认导出
+```
+
+导出对象
+
+```js
+[Module: null prototype] {
+  arr: [],
+  default: 'default'
+  num: 1,
+  obj: {}
+}
+```
+
+### **import**
+
+静态 **`import`** 声明用于导入由另一个模块导出的只读动态绑定
+
+导入的绑定被称为*动态绑定*，因为它们会由导出绑定的模块更新，但导入模块不能重新赋值
+
+`import` 声明有四种形式：
+
+* 具名导入
+
+  ```js
+  import { num } from './ModuleA.js'
+  console.log(num);    // 1
+  ```
+
+* 默认导入
+
+  ```js
+  import ModuleA from './ModuleA.js'
+  console.log(ModuleA);    // default
+  ```
+
+* 命名空间导入
+
+  ```js
+  import * as ModuleA from "./ModuleA.js"
+  console.log(ModuleA);   //[Module: null prototype] { arr: [], default: 'default', num: 1, obj: {} }
+  // ModuleA 是一个密封的对象, 其原型为 null。它提供了一个名为 default 的键, 用于访问默认导出
+  ```
+
+* 副作用导入
+
+  ```js
+  import "./ModuleA.js"
+  ```
+
+  
+
+
+
+
 
 
 

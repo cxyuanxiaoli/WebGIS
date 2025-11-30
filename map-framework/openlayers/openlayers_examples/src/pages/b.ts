@@ -5,7 +5,7 @@ export default function () {
   const map = new Map({
     view: new View({
       center: [0, 0],
-      zoom: 1,
+      zoom: 15,
       projection: "EPSG:3857",
     }),
     layers: [
