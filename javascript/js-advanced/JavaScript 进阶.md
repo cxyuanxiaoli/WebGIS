@@ -101,6 +101,87 @@ console.log(p, otherProps); // 42 { q: true, r: "hello" }
 
 `for...of` 语句在可迭代对象（包括`Array`、`Map`、`Set`、`arguments` 等等）上创建了一个循环，对值的每一个独特属性调用一次迭代。
 
+## 索引集合类
+
+索引集合为按索引值排序的数据集合。包括数组和类数组结构，如 `Array` 对象和 `TypedArray` 对象
+
+### Array
+
+`Array` 对象具有下列方法:
+
+* push()  pop()  unshift()  shift()
+* concat()  slice()  join()  flat() 
+* reverse()  sort()  splice()  toReversed()  toSorted()  toSpliced()
+* at()  indexOf()  lastIndexOf()
+* forEach()  map()  flatMap()  filter()  find()  findLast()  findIndex()  findLastIndex()  reduce()  reduceRight()  every()  some()
+
+数组可以包含“空槽”，成为稀疏数组，这与用值 `undefined` 填充的槽不一样
+
+```js
+const a = Array(5); // [ <5 empty items> ]
+const b = [1, 2, , , 5]; // [ 1, 2, <2 empty items>, 5 ]
+const c = [1, 2];
+c[4] = 5; // [ 1, 2, <2 empty items>, 5 ]
+const d = [1, 2];
+d.length = 5; // [ 1, 2, <3 empty items> ]
+const e = [1, 2, 3, 4, 5];
+delete e[2]; // [ 1, 2, <1 empty item>, 4, 5 ]
+```
+
+在某些操作中，空槽的行为就像它们被填入了 `undefined` 那样
+
+```js
+console.log(a[0]);    // undefined
+for (const i of b) {
+  console.log(i);     // 1 2 undefined undefined 5
+}
+console.log(...c);    // 1 2 undefined undefined 5
+```
+
+在其他方法，特别是数组迭代方法时，空槽是被跳过的
+
+```js
+const b = [1, 2, , , 5];
+b.forEach((value) => console.log(value));      // 1 2 5
+console.log(b.map((value) => value * value));  // [ 1, 4, <2 empty items>, 25 ]
+```
+
+### TypedArray
+
+JavaScript 类型化数组是一种类似数组的对象，并提供了一种用于在内存缓冲中访问原始二进制数据的机制
+
+**`ArrayBuffer`** 对象用来表示通用的原始二进制数据缓冲区，不能直接操作 `ArrayBuffer` 中的内容；而是要通过`TypedArray`对象或 `DataView` 对象来操作，它们会将缓冲区中的数据表示为特定的格式，并通过这些格式来读写缓冲区的内容
+
+#### 构造函数
+
+`TypedArray` 构造函数是所有 `TypedArray` 子类的通用父类。将 `%TypedArray%` 作为一个“抽象类”，其为所有类型化数组的子类提供了实用方法的通用接口。该构造函数没有直接暴露：没有全局的 `TypedArray` 属性，当创建 `TypedArray` 子类（例如 `Int8Array`）的实例时，在内存的中会创建数组缓冲区，或者，如果将 `ArrayBuffer` 对象作为构造参数，则使用该 `ArrayBuffer`
+
+`TypedArray` 子类：
+
+* Int8Array
+* Uint8Array
+* Uint8ClampedArray
+* Int16Array
+* Uint16Array
+* Int32Array
+* Uint32Array
+* Float32Array
+* Float64Array
+* BigInt64Array
+* BigUint64Array
+
+```js
+const int8 = new Int8Array(5);
+console.log(int8);      // Int8Array(6) [ 0, 0, 0, 0, 0, 0 ]
+console.log(int8 instanceof Array);     // false
+for (let i = 0; i < int8.length; i++) {
+  view[i] = i * 2;
+}
+console.log(int8);     // Int8Array(6) [ 0, 2, 4, 6, 8, 10 ]
+const int16 = new Int16Array(int8.buffer);
+console.log(int16);    // Int16Array(3) [ 512, 1540, 2568 ]
+```
+
 ## 函数
 
 ### length

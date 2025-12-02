@@ -5,13 +5,13 @@ import Map from "ol/Map";
 const nameMap = [
   {
     name: "Accessible Map",
-    label: "Accessible Map",
-    url: "./pages/a.ts",
+    label: "快速入门",
+    url: "./pages/Accessible_Map.ts",
   },
   {
-    name: "Accessible Map2",
-    label: "Accessible Map2",
-    url: "./pages/b.ts",
+    name: "TileLayer Debug",
+    label: "瓦片图层调试",
+    url: "./pages/TileLayer_Debug.ts",
   },
 ];
 renderList();
