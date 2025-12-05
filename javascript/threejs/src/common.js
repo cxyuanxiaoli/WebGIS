@@ -20,8 +20,12 @@ export function initScene() {
   //创建渲染器
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
+    alpha: true,
+    //想把canvas画布上内容下载到本地，需要设置为true
+    preserveDrawingBuffer: true,
   });
   renderer.setPixelRatio(window.devicePixelRatio);
+  // 设置背景色
   renderer.setClearColor(0xffffff);
   renderer.setSize(width, height);
   renderer.render(scene, camera);

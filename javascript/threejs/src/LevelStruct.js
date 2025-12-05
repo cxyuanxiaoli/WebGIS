@@ -118,4 +118,30 @@ console.log("本地坐标", testBox.position);
 const localAxesHelper = new THREE.AxesHelper(50);
 testGroup.add(localAxesHelper);
 
+const testBox2 = new THREE.Mesh(
+  new THREE.BoxGeometry(10, 10, 10),
+  new THREE.MeshLambertMaterial({ color: 0xff0000 })
+);
+testGroup.add(testBox2);
+// 平移几何体的顶点坐标,改变几何体自身相对局部坐标原点的位置
+testBox2.geometry.translate(10, 3, 0);
+// .rotate()是绕局部坐标轴旋转的
+function render() {
+  testBox2.rotateY(0.01); //旋转动画
+  requestAnimationFrame(render);
+}
+render();
+//#endregion
+
+//#region 移除/隐藏对象
+// .remove()方法是把子对象从父对象的.children()属性中删除
+
+const building9 = buildGroup.getObjectByName("9号楼");
+console.log(building9);
+
+building9.parent.remove(building9); //从父对象中移除
+
+// Object3D封装了一个属性.visible，通过该属性可以隐藏或显示一个模型
+const building5 = buildGroup.getObjectByName("5号楼");
+building5.visible = false; //隐藏对象
 //#endregion

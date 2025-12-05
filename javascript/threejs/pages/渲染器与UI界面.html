@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renderer and UI Interface</title>
+    <style>
+      .bg {
+        width: 20%;
+        height: 20%;
+        position: absolute;
+        top: 10%;
+        left: 40%;
+        background-color: #a3d2a3;
+      }
+      .left-menu {
+        width: 20%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #d2a3a3;
+        opacity: 0.8;
+        z-index: 1;
+        padding: 20px;
+        box-sizing: border-box;
+        button {
+          margin-bottom: 10px;
+        }
+      }
+      .webgl {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg"></div>
+    <div class="left-menu">
+      <button id="save">保存图片</button>
+      <button id="load">加载模型</button><br />
+      <span id="progress">进度...</span>
+      <input id="loadInput" type="file" style="display: none" />
+    </div>
+    <div class="webgl"></div>
+    <script type="module" src="../src/RendererUI.js"></script>
+  </body>
+</html>
