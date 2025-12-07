@@ -7,7 +7,9 @@ const { scene, camera, renderer } = initScene();
 renderer.setClearAlpha(0); //完全透明
 
 //#region 光源设置
-const poinLight = new THREE.PointLight(0xffffff, 1, 1000, 0);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+const poinLight = new THREE.PointLight(0xffffff, 1, 5000, 0);
 poinLight.position.set(0, 60, 100);
 scene.add(poinLight);
 //#endregion
@@ -33,7 +35,7 @@ document.querySelector("#loadInput").onchange = (e) => {
   loader.load(
     url,
     (gltf) => {
-      gltf.scene.scale.set(10, 10, 10);
+      gltf.scene.scale.set(5, 5, 5);
       scene.add(gltf.scene);
     },
     (xhr) => {
