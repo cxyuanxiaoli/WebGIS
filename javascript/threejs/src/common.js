@@ -2,7 +2,7 @@ import "./main.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-export function initScene() {
+export function initScene(cameraType = "perspective") {
   const width = window.innerWidth;
   const height = window.innerHeight;
 
@@ -13,7 +13,18 @@ export function initScene() {
   scene.add(axesHelper);
 
   //创建相机
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 3000);
+  const aspect = width / height;
+  const camera =
+    cameraType === "perspective"
+      ? new THREE.PerspectiveCamera(75, aspect, 0.1, 3000)
+      : new THREE.OrthographicCamera(
+          -2000 * aspect,
+          2000 * aspect,
+          2000,
+          -2000,
+          0.1,
+          3000
+        );
   camera.position.set(100, 100, 100);
   camera.lookAt(0, 0, 0);
 
@@ -36,7 +47,15 @@ export function initScene() {
   //自适应窗口大小
   window.onresize = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const aspect = window.innerWidth / window.innerHeight;
+    if (cameraType === "perspective") {
+      // 更新透视相机视锥体长宽比
+      camera.aspect = aspect;
+    } else {
+      // 更新正交相机left、right
+      camera.left = -2000 * aspect;
+      camera.right = 2000 * aspect;
+    }
     camera.updateProjectionMatrix();
   };
 
