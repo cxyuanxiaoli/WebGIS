@@ -18,12 +18,12 @@ export function initScene(cameraType = "perspective") {
     cameraType === "perspective"
       ? new THREE.PerspectiveCamera(75, aspect, 0.1, 3000)
       : new THREE.OrthographicCamera(
-          -2000 * aspect,
-          2000 * aspect,
-          2000,
-          -2000,
+          -3500 * aspect,
+          3500 * aspect,
+          3500,
+          -3500,
           0.1,
-          3000
+          5000
         );
   camera.position.set(100, 100, 100);
   camera.lookAt(0, 0, 0);
@@ -42,7 +42,11 @@ export function initScene(cameraType = "perspective") {
   renderer.render(scene, camera);
 
   //创建控件
-  new OrbitControls(camera, renderer.domElement);
+  const orbitControl = new OrbitControls(camera, renderer.domElement);
+  const updateOrbitControl = (target) => {
+    orbitControl.target.set(target.x, target.y, target.z);
+    orbitControl.update();
+  };
 
   //自适应窗口大小
   window.onresize = () => {
@@ -53,8 +57,8 @@ export function initScene(cameraType = "perspective") {
       camera.aspect = aspect;
     } else {
       // 更新正交相机left、right
-      camera.left = -2000 * aspect;
-      camera.right = 2000 * aspect;
+      camera.left = -3500 * aspect;
+      camera.right = 3500 * aspect;
     }
     camera.updateProjectionMatrix();
   };
@@ -65,5 +69,5 @@ export function initScene(cameraType = "perspective") {
     requestAnimationFrame(render);
   }
   render();
-  return { scene, camera, renderer };
+  return { scene, camera, renderer, orbitControl, updateOrbitControl };
 }
