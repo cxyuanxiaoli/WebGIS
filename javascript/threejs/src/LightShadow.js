@@ -1,6 +1,7 @@
 import { initScene } from "./common.js";
 import * as THREE from "three";
 import { GUI } from "dat.gui";
+import * as Suncalc from "suncalc";
 
 const { scene, camera, renderer } = initScene();
 document.body.appendChild(renderer.domElement);
@@ -52,7 +53,12 @@ scene.add(boxMesh);
 
 const directLight = new THREE.DirectionalLight(0xffffff, 1.0);
 scene.add(directLight);
-directLight.position.set(-220, 190, 0);
+directLight.target.position.x = 300;
+directLight.target.position.y = 0;
+directLight.target.position.z = 130;
+scene.add(directLight.target);
+
+directLight.position.set(0, 260, 0);
 // 1.光源对象开启光源阴影计算
 directLight.castShadow = true;
 gui.add(directLight, "intensity", 0, 5).name("平行光强度");
@@ -69,8 +75,8 @@ boxFolder.add(boxMesh2.position, "y", -20, 70);
 boxFolder.add(boxMesh2.position, "z", 40, 200);
 
 const planeMesh = new THREE.Mesh(
-  new THREE.PlaneGeometry(200, 200),
-  new THREE.MeshLambertMaterial({ color: 0x888888 })
+  new THREE.PlaneGeometry(400, 300),
+  new THREE.MeshLambertMaterial({ color: 0x888888, side: THREE.DoubleSide })
 );
 planeMesh.position.set(300, 0, 130);
 planeMesh.rotation.x = -Math.PI / 2;
@@ -98,12 +104,12 @@ renderer.shadowMap.enabled = true;
 // 查看平行光阴影相机属性
 console.log("阴影相机属性", directLight.shadow.camera);
 // 5.设置三维场景计算阴影的范围
-directLight.shadow.camera.left = -50;
-directLight.shadow.camera.right = 250;
-directLight.shadow.camera.top = 300;
-directLight.shadow.camera.bottom = -50;
+directLight.shadow.camera.left = -100;
+directLight.shadow.camera.right = 100;
+directLight.shadow.camera.top = 120;
+directLight.shadow.camera.bottom = -120;
 directLight.shadow.camera.near = 0.5;
-directLight.shadow.camera.far = 600;
+directLight.shadow.camera.far = 1200;
 
 // 可视化平行光阴影对应的正投影相机对象
 const cameraHelper = new THREE.CameraHelper(directLight.shadow.camera);
@@ -125,7 +131,8 @@ directLight.shadow.radius = 2;
 //#endregion
 
 //#region 环境贴图
-
+// 不设置任何光源和环境贴图，gltf模型默认PBR材质不会正常显示，一片漆黑。
+// 只设置环境贴图，物体表面也能看到。虽然环境贴图不是光源，但是会模拟物体周围环境的反射光
 const cubeTexture = new THREE.CubeTextureLoader().load([
   "../data/env1.jpg",
   "../data/env1.jpg",
@@ -145,5 +152,156 @@ const box1 = new THREE.Mesh(
 );
 box1.position.set(20, 15, 350);
 scene.add(box1);
+
+gui
+  .addFolder("盒子1的环境贴图强度")
+  .add(box1.material, "envMapIntensity", 0, 5)
+  .name("强度");
+//#endregion
+
+//#region 平行光模拟太阳光
+const obj = {
+  // 太阳方位角
+  azimuth: 203.4,
+  // 太阳高度角
+  elevation: 38.5,
+};
+
+// 太阳高度角变化函数
+const elevFunc = (value) => {
+  obj.elevation = value;
+  // 围绕点位置
+  const target = new THREE.Vector3(300, 0, 130);
+  // 根据高度角变化计算光源位置
+  directLight.position.copy(
+    calculatePosition(directLight.position, target, obj.elevation)
+  );
+  // 更新辅助对象
+  directLightHelper.update();
+};
+
+// 太阳方位角变化函数
+const aziFunc = (value) => {
+  obj.azimuth = value;
+  const rad = (value / 180) * Math.PI;
+  const target = new THREE.Vector3(300, 0, 130);
+  const horizonDistance = 326.95; // 水平距离
+  // 根据方位角变化计算光源位置
+  directLight.position.x = target.x + horizonDistance * Math.cos(rad);
+  directLight.position.z = target.z + horizonDistance * Math.sin(rad);
+  directLightHelper.update();
+};
+
+gui.add(obj, "elevation", 1, 89).onChange(elevFunc).name("平行光高度角");
+gui.add(obj, "azimuth", 0, 360).onChange(aziFunc).name("平行光方位角");
+
+/**
+ * @function calculateNewAPositionVector3 根据传入的高度角重新计算A点的坐标
+ * @param {THREE.Vector3} A 动点
+ * @param {THREE.Vector3} B 围绕点
+ * @param {number} elevation  B点看A点的高度角
+ * @returns {THREE.Vector3} 新的A点坐标
+ */
+function calculatePosition(A, B, elevation) {
+  const d = A.distanceTo(B); // 计算光源与中心点距离
+  const dVector = A.clone().sub(B).normalize(); // 计算光源与中心点的单位方向向量
+  const horizonVector = dVector.clone().setY(0).normalize(); // 计算光源与中心点连线在水平面的单位方向向量
+  const thetaRad = THREE.MathUtils.degToRad(elevation);
+  // 计算垂直距离与水平距离
+  const horizonComponent = d * Math.cos(thetaRad);
+  const verticalComponent = d * Math.sin(thetaRad);
+
+  return new THREE.Vector3(
+    B.x + horizonComponent * horizonVector.x,
+    B.y + verticalComponent,
+    B.z + horizonComponent * horizonVector.z
+  );
+}
+
+const sunFolder = gui.addFolder("太阳运行动画");
+const timeObj = {
+  animate: false,
+  month: 8,
+  speed: 100,
+};
+sunFolder.add(timeObj, "animate").name("开始动画");
+sunFolder
+  .add(timeObj, "month", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+  .onChange((value) => {
+    timeObj.month = value;
+    time.setMonth(timeObj.month - 1);
+  })
+  .name("月份");
+
+// 时间变量
+const time = new Date();
+time.setHours(0, 0, 0);
+time.setMonth(timeObj.month - 1);
+let min = 0;
+// 地点变量
+const location = [39.9042, 116.4074];
+
+sunFolder.add(location, "0", -80, 80, 5).name("纬度");
+
+// 时间提示
+const span = document.createElement("span");
+span.textContent = "时间：";
+span.style = "font-size:18px;color:white;position:absolute;top:10px;left:10px";
+document.body.appendChild(span);
+
+// 太阳轨迹动画
+const func = () => {
+  if (!timeObj.animate) {
+    return;
+  }
+  time.setMinutes(min);
+
+  // 根据时间计算太阳位置
+  const position = Suncalc.getPosition(time, ...location);
+  obj.azimuth = (position.azimuth * 180) / Math.PI + 180;
+  obj.elevation = (position.altitude * 180) / Math.PI;
+  // 更新光源位置
+  elevFunc(obj.elevation);
+  aziFunc(obj.azimuth);
+
+  // 更新文本提示
+  if (time.getMinutes() % 30 == 0) {
+    span.textContent = `时间：${time.toLocaleString()}, 高度角：${obj.elevation.toFixed(
+      2
+    )}°, 方位角：${obj.azimuth.toFixed(2)}°`;
+  }
+
+  // 太阳未升起，光源强度为0
+  if (obj.elevation < 0) {
+    directLight.intensity = 0;
+  } else {
+    directLight.intensity = 1;
+  }
+
+  // 时间递增
+  min += 2;
+  if (min >= 60) {
+    time.setHours((time.getHours() + 1) % 24);
+    min = 0;
+  }
+};
+
+// 开始动画
+let intervalId;
+intervalId = setInterval(func, timeObj.speed);
+// 改变动画速率
+sunFolder
+  .add(timeObj, "speed", 10, 100, 10)
+  .onChange(() => {
+    clearInterval(intervalId);
+    intervalId = setInterval(func, timeObj.speed);
+  })
+  .name("动画速度");
+//#endregion
+
+//#region 阴影类型
+// 渲染器的阴影贴图属性.shadowMap的属性值是一个对象，具有.enabled、.type等属性。
+// 模型表面产生条纹影响渲染效果，可以改变.shadowMap.type默认值优化
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 //#endregion
