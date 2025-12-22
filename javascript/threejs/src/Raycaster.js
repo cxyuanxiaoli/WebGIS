@@ -1,9 +1,12 @@
 import { initScene } from "./common.js";
 import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
 
 const { renderer, camera, scene } = initScene();
 document.body.appendChild(renderer.domElement);
-renderer.setClearColor(0x000000, 1);
+renderer.setClearColor(0xaaaaaa, 1);
 
 //#region 射线Ray
 // 射线Ray和三维向量Vector3一样属于数学几何计算相关的API,可以进行射线交叉计算
@@ -90,9 +93,7 @@ document.addEventListener("click", function (event) {
     event.clientX,
     event.clientY,
     event.offsetX,
-    event.offsetY
-  );
-  console.log(
+    event.offsetY,
     "屏幕坐标转标准设备坐标",
     screenToDevice(
       event.offsetX,
@@ -144,4 +145,141 @@ renderer.domElement.onclick = (event) => {
     clickedObjs[0].object.material = clickMaterial;
   }
 };
+//#endregion
+
+//#region 射线拾取层级模型
+const pointLight = new THREE.PointLight(0xffffff, 3, 1000, 0);
+pointLight.position.set(40, 50, 100);
+scene.add(pointLight);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+// 构建层级模型
+const group = new THREE.Group();
+group.position.set(0, 10, 200);
+group.name = "组对象";
+const group2 = new THREE.Group();
+group2.position.set(200, 10, 200);
+group2.name = "组对象2";
+
+const box = new THREE.Mesh(
+  new THREE.BoxGeometry(150, 20, 150),
+  new THREE.MeshLambertMaterial({ color: 0xff0000 })
+);
+box.name = "底座";
+group.add(box);
+
+group2.add(box.clone());
+
+for (let i = 0; i < 5; i++) {
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(20, 20, 20),
+    new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff })
+  );
+  box.position.set(Math.random() * 130 - 65, 20, Math.random() * 130 - 65);
+  box.name = "子物体" + i;
+  group.add(box);
+  group2.add(box.clone());
+}
+group.updateMatrixWorld(true);
+scene.add(group);
+scene.add(group2);
+
+// 如果需要实现点击任一子物体均能选中整个组对象，则需要给每个子物体添加一个属性，指向其父对象
+// 在点击事件中，通过该属性获取到组对象，为整个组对象添加描边效果
+group.traverse((child) => {
+  if (child.isMesh) {
+    child.ancestor = group;
+  }
+});
+
+// 后处理
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const v2 = new THREE.Vector2(
+  renderer.domElement.clientWidth,
+  renderer.domElement.clientHeight
+);
+// 添加描边效果
+const outlinePass = new OutlinePass(v2, scene, camera);
+outlinePass.selectedObjects = [group];
+composer.addPass(outlinePass);
+
+// 点击事件
+const raycaster3 = new THREE.Raycaster();
+renderer.domElement.addEventListener("click", (event) => {
+  const { x, y } = screenToDevice2(event.offsetX, event.offsetY);
+  raycaster3.setFromCamera(new THREE.Vector2(x, y), camera);
+  const intersects = raycaster3.intersectObjects([group, group2]);
+  if (intersects.length > 0) {
+    console.log("点击物体名称：" + intersects[0].object.name);
+    if (intersects[0].object.ancestor) {
+      // 给整个组对象添加描边效果
+      outlinePass.selectedObjects = [intersects[0].object.ancestor];
+    } else {
+      // 给单个物体添加描边效果
+      outlinePass.selectedObjects = [intersects[0].object];
+    }
+  } else {
+    outlinePass.selectedObjects = [];
+  }
+});
+
+// 渲染循环
+function render() {
+  composer.render();
+  requestAnimationFrame(render);
+}
+render();
+//#endregion
+
+//#region 射线拾取Sprite
+const cylinder1 = new THREE.Mesh(
+  new THREE.CylinderGeometry(25, 25, 50),
+  new THREE.MeshLambertMaterial({ color: 0xff0000 })
+);
+cylinder1.position.set(100, 25, -100);
+scene.add(cylinder1);
+
+const cylinder2 = cylinder1.clone();
+cylinder2.material = cylinder1.material.clone();
+cylinder2.position.set(180, 25, -100);
+scene.add(cylinder2);
+
+//添加精灵模型
+const spriteMaterial = new THREE.SpriteMaterial({
+  map: new THREE.TextureLoader().load("../data/sprite.png"),
+});
+
+const sprite1 = new THREE.Sprite(spriteMaterial);
+sprite1.scale.set(20, 20, 1);
+sprite1.position.set(100, 60, -100);
+scene.add(sprite1);
+
+const sprite2 = sprite1.clone();
+sprite2.position.set(180, 60, -100);
+scene.add(sprite2);
+
+// 三维场景中提供了两个精灵模型对象，可以分别自定义一个方法.change()
+sprite1.change = () => {
+  cylinder1.material.color.setHex(Math.random() * 0xffffff);
+};
+
+sprite2.change = () => {
+  cylinder2.material.color.setHex(Math.random() * 0xffffff);
+};
+
+// 精灵模型点击事件
+renderer.domElement.addEventListener("click", (event) => {
+  const { x, y } = screenToDevice2(event.offsetX, event.offsetY);
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+  // 射线交叉计算拾取精灵模型
+  const intersects = raycaster.intersectObjects([sprite1, sprite2]);
+  if (intersects.length > 0) {
+    intersects[0].object.change(); //执行选中sprite绑定的change函数
+  }
+});
 //#endregion
