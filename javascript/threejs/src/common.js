@@ -30,7 +30,7 @@ export function initScene(cameraType = "perspective") {
 
   //创建渲染器
   const renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: true, // 抗锯齿
     alpha: true,
     //想把canvas画布上内容下载到本地，需要设置为true
     preserveDrawingBuffer: true,
